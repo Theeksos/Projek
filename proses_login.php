@@ -3,7 +3,6 @@
 session_start();
 require_once "config/database.php";
 
-// Pastikan form dikirim dengan method POST
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: login.php");
     exit;
