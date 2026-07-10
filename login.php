@@ -52,8 +52,6 @@ unset($_SESSION['login_error']);
             </form>
         </div>
     </div>
-
-    <!-- JavaScript Native untuk validasi form sebelum dikirim ke server -->
     <script src="assets/js/validasi.js"></script>
 </body>
 </html>
