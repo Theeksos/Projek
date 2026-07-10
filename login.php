@@ -1,17 +1,12 @@
 <?php
-// File: login.php
-// Fungsi: Halaman Login (Presentation Layer)
-// Ini adalah halaman pertama yang dilihat semua user (Owner/Mitra/Staff)
 
 session_start();
 
-// Kalau sudah login, langsung lempar ke dashboard, tidak perlu login lagi
 if (isset($_SESSION['id_user'])) {
     header("Location: dashboard.php");
     exit;
 }
 
-// Ambil pesan error dari proses_login.php (jika ada, dikirim lewat session)
 $error = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 ?>
@@ -22,11 +17,8 @@ unset($_SESSION['login_error']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Dough & Co Hub</title>
 
-    <!-- Bootstrap 5 (sesuai ketentuan makalah) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons untuk ikon username & password -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- CSS custom kita -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
