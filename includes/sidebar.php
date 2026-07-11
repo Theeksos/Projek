@@ -1,16 +1,9 @@
 <?php
-/**
- * File: includes/sidebar.php
- * Fungsi: Menu navigasi kiri, dipakai di semua halaman dashboard.
- * Cara pakai: sebelum include file ini, set variabel $halaman_aktif
- * contoh: $halaman_aktif = "laporan";
- */
 
 if (!isset($halaman_aktif)) {
     $halaman_aktif = "";
 }
 
-// Daftar menu: key => [label, file tujuan, ikon Bootstrap Icons]
 $menu = [
     "dashboard" => ["Dashboard", "dashboard_owner.php", "bi-grid-1x2-fill"],
     "kios"      => ["Kios",      "#", "bi-shop"],
@@ -22,7 +15,6 @@ $menu = [
     "mitra"     => ["Mitra",     "#", "bi-diagram-3-fill"],
 ];
 
-// Inisial nama untuk avatar bulat (contoh: "Jova Putri" -> "JP")
 $nama_user = $_SESSION['nama'] ?? 'User';
 $kata = explode(" ", $nama_user);
 $inisial = strtoupper(substr($kata[0], 0, 1) . (isset($kata[1]) ? substr($kata[1], 0, 1) : ""));
