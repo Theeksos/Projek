@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 // File: login.php
 // Fungsi: Halaman Login (Presentation Layer)
 // Ini adalah halaman pertama yang dilihat semua user (Owner/Mitra/Staff)
@@ -6,12 +7,20 @@
 session_start();
 
 // Kalau sudah login, langsung lempar ke dashboard, tidak perlu login lagi
+=======
+
+session_start();
+
+>>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 if (isset($_SESSION['id_user'])) {
     header("Location: dashboard.php");
     exit;
 }
 
+<<<<<<< HEAD
 // Ambil pesan error dari proses_login.php (jika ada, dikirim lewat session)
+=======
+>>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 $error = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 ?>
@@ -22,11 +31,16 @@ unset($_SESSION['login_error']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Dough & Co Hub</title>
 
+<<<<<<< HEAD
     <!-- Bootstrap 5 (sesuai ketentuan makalah) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons untuk ikon username & password -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <!-- CSS custom kita -->
+=======
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+>>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -60,8 +74,11 @@ unset($_SESSION['login_error']);
             </form>
         </div>
     </div>
+<<<<<<< HEAD
 
     <!-- JavaScript Native untuk validasi form sebelum dikirim ke server -->
+=======
+>>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
     <script src="assets/js/validasi.js"></script>
 </body>
 </html>
