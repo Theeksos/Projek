@@ -1,6 +1,4 @@
 <?php
-// File: dashboard_owner.php
-// Halaman ini hanya boleh diakses jika sudah login DAN role-nya sesuai
 session_start();
 
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'owner') {
@@ -19,7 +17,7 @@ if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'owner') {
     <div class="container">
         <h2 class="mb-3" style="color:#DB2777;">Selamat datang, <?= htmlspecialchars($_SESSION['nama']) ?> 👋</h2>
         <p class="text-muted">Kamu login sebagai: <strong><?= ucfirst($_SESSION['role']) ?></strong></p>
-        <p>Ini halaman placeholder dashboard owner. Silakan dikembangkan sesuai fitur di makalah (Monitoring, Stok, dsb).</p>
+        <p>belum gw isi wokwokwokwok.</p>
         <a href="logout.php" class="btn btn-outline-danger">Logout</a>
     </div>
 </body>
