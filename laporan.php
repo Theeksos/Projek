@@ -10,8 +10,7 @@ if (!isset($_SESSION['id_user'])) {
 
 $halaman_aktif = "laporan";
 
-$periode = $_GET['periode'] ?? date("Y-m"); // default: bulan berjalan
-// Validasi format supaya tidak dipakai untuk SQL Injection lewat URL
+$periode = $_GET['periode'] ?? date("Y-m"); 
 if (!preg_match('/^\d{4}-\d{2}$/', $periode)) {
     $periode = date("Y-m");
 }
@@ -113,7 +112,6 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="page-topbar">
             <h4>Laporan & Analitik</h4>
             <div class="topbar-actions">
-                <!-- Filter periode: submit form GET, halaman reload dengan data baru -->
                 <form method="GET" id="formPeriode">
                     <select name="periode" class="select-periode" onchange="document.getElementById('formPeriode').submit()">
                         <?php foreach ($opsi_periode as $value => $label): ?>
@@ -128,8 +126,6 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </a>
             </div>
         </div>
-
-        <!-- 4 Kartu ringkasan -->
         <div class="stat-grid">
             <div class="stat-card stat-pink">
                 <div class="stat-label">Pendapatan Bulan Ini</div>
@@ -148,14 +144,10 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="stat-value">Rp<?= number_format($rata_rata_harian, 0, ',', '.') ?></div>
             </div>
         </div>
-
-        <!-- Grafik tren harian -->
         <div class="panel">
             <div class="panel-title">Tren Pendapatan Harian (<?= strftime_id($periode) ?>)</div>
             <canvas id="chartTren" height="90"></canvas>
         </div>
-
-        <!-- Tabel perbandingan antar kios -->
         <div class="panel">
             <div class="panel-title">Perbandingan Antar Kios</div>
             <table class="table-custom">
@@ -173,7 +165,6 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php $no = 1; foreach ($tabel_kios as $row):
                         $rata2 = $row['hari_aktif'] > 0 ? $row['pendapatan_ini'] / $row['hari_aktif'] : 0;
 
-                        // Hitung persentase perubahan dibanding bulan lalu
                         if ($row['pendapatan_lalu'] > 0) {
                             $persen = (($row['pendapatan_ini'] - $row['pendapatan_lalu']) / $row['pendapatan_lalu']) * 100;
                         } else {
@@ -198,7 +189,6 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 </div>
 
-<!-- Chart.js untuk grafik batang (library bantu, logic datanya tetap dari PHP/MySQL) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
     const labelHari  = <?= json_encode($label_hari) ?>;
