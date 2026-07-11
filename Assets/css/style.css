@@ -1,0 +1,211 @@
+:root {
+    --bg-framer: #FFE1FA; /* Warna background utama di Figma */
+    --primary-pink: #FF3377;
+    --hover-pink: #E62266;
+    --text-pink: #FF3377;
+    --sidebar-text: #FF3377;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background-color: var(--bg-framer);
+    color: #333333;
+}
+
+/* ==========================================================================
+   SIDEBAR LAYOUT (WHITE RECTANGLE)
+   ========================================================================== */
+.sidebar {
+    background-color: #ffffff;
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem;
+    position: fixed;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.brand-title {
+    color: var(--text-pink);
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    padding-left: 0.5rem;
+}
+
+.nav-link-custom {
+    color: var(--sidebar-text);
+    padding: 0.6rem 0.8rem;
+    display: block;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.nav-link-custom:hover, 
+.nav-link-custom.active {
+    background-color: var(--primary-pink);
+    color: white !important;
+}
+
+.btn-logout {
+    background-color: var(--primary-pink);
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+    transition: background 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: var(--hover-pink);
+}
+
+/* ==========================================================================
+   MAIN CONTENT & CONTENT CONTAINER
+   ========================================================================== */
+.main-content {
+    margin-left: 16.66667%;
+    padding: 3rem;
+}
+
+.page-title {
+    font-weight: 800;
+    color: #000000;
+    font-size: 1.8rem;
+}
+
+/* Buttons & Inputs */
+.btn-pink {
+    background-color: var(--primary-pink);
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.btn-pink:hover {
+    background-color: var(--hover-pink);
+    color: white;
+}
+
+.btn-outline-pink {
+    border: 1px solid #E2E8F0;
+    color: var(--text-pink);
+    font-weight: 500;
+    background: #ffffff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    padding: 0.3rem 1.2rem;
+}
+
+.btn-outline-pink:hover {
+    background-color: var(--primary-pink);
+    color: white;
+    border-color: var(--primary-pink);
+}
+
+.search-input {
+    border-radius: 6px;
+    border: 1px solid #CBD5E0;
+    background-color: #E2E8F0; /* Abu-abu seperti di figma search */
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    width: 200px;
+}
+
+/* ==========================================================================
+   SUMMARY CARDS (SOFT GRADIENTS)
+   ========================================================================== */
+.summary-card {
+    border: none;
+    border-radius: 14px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.card-total-stok { background: linear-gradient(135deg, #FFB7CE, #FFA2C0); }
+.card-aktif { background: linear-gradient(135deg, #A3EBB1, #8CE39D); }
+.card-kritis { background: linear-gradient(135deg, #FF9E9E, #FF8585); }
+
+/* Custom warna figma tambahan untuk pelengkap */
+.card-warning { background: linear-gradient(135deg, #FFE082, #FFD54F); }
+.card-purple { background: linear-gradient(135deg, #CE93D8, #BA68C8); }
+
+.card-label {
+    color: #4A5568;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.card-value {
+    color: #333333;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-top: 0.2rem;
+}
+
+/* ==========================================================================
+   TABLE FIGMA STYLE (ROW BOX WITH BORDER RAD)
+   ========================================================================== */
+.table-container {
+    background-color: transparent; /* Transparan karena row-nya yang warna putih */
+    padding: 0;
+    margin-top: 1.5rem;
+}
+
+.table thead th {
+    color: var(--text-pink);
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    padding-bottom: 1rem;
+}
+
+/* Membuat efek row berjarak dan melengkung putih */
+.table tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    display: table-row;
+}
+
+/* Trik spasi antar baris */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 10px; 
+}
+
+.table tbody td {
+    padding: 1rem;
+    border: none;
+    background-color: #ffffff;
+}
+
+/* Melengkungkan sudut kiri dan kanan tiap baris */
+.table tbody tr td:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.table tbody tr td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Progress Bar Custom untuk Stok */
+.progress {
+    background-color: #E2E8F0;
+    border-radius: 10px;
+    height: 12px;
+}
+.bg-stok-aman { background-color: #8CE39D !important; }
+.bg-stok-warning { background-color: #FFE082 !important; }
+.bg-stok-kritis { background-color: #FF8585 !important; }
