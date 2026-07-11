@@ -1,11 +1,4 @@
 <?php
-/**
- * File: export_laporan_pdf.php
- * Fungsi: Menyediakan versi "siap cetak" dari laporan, supaya bisa
- * disimpan sebagai PDF lewat fitur Print bawaan browser
- * (Ctrl+P -> Save as PDF). Ini pendekatan paling sederhana untuk
- * PHP Native tanpa perlu install library PDF tambahan.
- */
 
 session_start();
 require_once "config/database.php";
