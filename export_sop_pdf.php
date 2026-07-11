@@ -1,9 +1,4 @@
 <?php
-/**
- * File: export_sop_pdf.php
- * Fungsi: Versi siap cetak dari satu SOP, supaya bisa disimpan sebagai
- * PDF lewat fitur Print bawaan browser (Ctrl+P -> Save as PDF).
- */
 
 session_start();
 require_once "config/database.php";
