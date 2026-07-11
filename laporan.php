@@ -1,16 +1,8 @@
 <?php
-/**
- * File: laporan.php
- * Fungsi: Dashboard Laporan & Analitik (Presentation + Logic Layer)
- * Menampilkan ringkasan pendapatan, grafik tren harian,
- * dan perbandingan performa antar kios — sesuai halaman
- * "4. HALAMAN LAPORAN" pada makalah.
- */
 
 session_start();
 require_once "config/database.php";
 
-// --- Proteksi: hanya user yang sudah login boleh akses ---
 if (!isset($_SESSION['id_user'])) {
     header("Location: login.php");
     exit;
@@ -18,26 +10,20 @@ if (!isset($_SESSION['id_user'])) {
 
 $halaman_aktif = "laporan";
 
-// =========================================================
-// 1. Tentukan periode yang dipilih (dari dropdown, via GET)
-// =========================================================
 $periode = $_GET['periode'] ?? date("Y-m"); // default: bulan berjalan
 // Validasi format supaya tidak dipakai untuk SQL Injection lewat URL
 if (!preg_match('/^\d{4}-\d{2}$/', $periode)) {
     $periode = date("Y-m");
 }
 
-// Hitung periode bulan sebelumnya (untuk kolom "vs lalu")
 $periode_lalu = date("Y-m", strtotime($periode . "-01 -1 month"));
 
-// Siapkan daftar pilihan periode untuk dropdown (6 bulan terakhir)
 $opsi_periode = [];
 for ($i = 0; $i < 6; $i++) {
     $bulanKe = date("Y-m", strtotime(date("Y-m") . "-01 -$i month"));
     $opsi_periode[$bulanKe] = strftime_id($bulanKe);
 }
 
-// Fungsi kecil untuk format "2026-07" -> "Juli 2026" (tanpa perlu ekstensi intl)
 function strftime_id($ym) {
     $bulanIndo = [
         1=>"Januari",2=>"Februari",3=>"Maret",4=>"April",5=>"Mei",6=>"Juni",
@@ -47,25 +33,18 @@ function strftime_id($ym) {
     return $bulanIndo[(int)$m] . " " . $y;
 }
 
-// =========================================================
-// 2. Query: 4 kartu ringkasan (stat cards)
-// =========================================================
-
-// Total pendapatan bulan ini
 $stmt = $koneksi->prepare("SELECT COALESCE(SUM(total_pendapatan),0) AS total
                             FROM tb_transaksi WHERE DATE_FORMAT(tanggal, '%Y-%m') = :periode");
 $stmt->bindParam(':periode', $periode);
 $stmt->execute();
 $pendapatan_bulan_ini = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Total transaksi bulan ini
 $stmt = $koneksi->prepare("SELECT COALESCE(SUM(jumlah_transaksi),0) AS total
                             FROM tb_transaksi WHERE DATE_FORMAT(tanggal, '%Y-%m') = :periode");
 $stmt->bindParam(':periode', $periode);
 $stmt->execute();
 $total_transaksi = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Kios dengan pendapatan tertinggi bulan ini
 $stmt = $koneksi->prepare("SELECT k.nama_kios, SUM(t.total_pendapatan) AS total
                             FROM tb_transaksi t
                             JOIN tb_kios k ON k.id_kios = t.id_kios
@@ -76,7 +55,6 @@ $stmt->execute();
 $kios_terbaik = $stmt->fetch(PDO::FETCH_ASSOC);
 $nama_kios_terbaik = $kios_terbaik['nama_kios'] ?? '-';
 
-// Rata-rata omset per hari aktif (hanya hari yang ada transaksinya)
 $stmt = $koneksi->prepare("SELECT COUNT(DISTINCT tanggal) AS jumlah_hari
                             FROM tb_transaksi WHERE DATE_FORMAT(tanggal, '%Y-%m') = :periode");
 $stmt->bindParam(':periode', $periode);
@@ -84,9 +62,6 @@ $stmt->execute();
 $jumlah_hari_aktif = (int) $stmt->fetch(PDO::FETCH_ASSOC)['jumlah_hari'];
 $rata_rata_harian = $jumlah_hari_aktif > 0 ? round($pendapatan_bulan_ini / $jumlah_hari_aktif) : 0;
 
-// =========================================================
-// 3. Query: data grafik tren pendapatan harian
-// =========================================================
 $stmt = $koneksi->prepare("SELECT DAY(tanggal) AS hari, SUM(total_pendapatan) AS total
                             FROM tb_transaksi
                             WHERE DATE_FORMAT(tanggal, '%Y-%m') = :periode
@@ -102,9 +77,6 @@ foreach ($data_grafik as $row) {
     $nilai_harian[] = (float) $row['total'];
 }
 
-// =========================================================
-// 4. Query: tabel perbandingan antar kios (bulan ini vs lalu)
-// =========================================================
 $stmt = $koneksi->prepare("
     SELECT
         k.nama_kios,
@@ -229,7 +201,6 @@ $tabel_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- Chart.js untuk grafik batang (library bantu, logic datanya tetap dari PHP/MySQL) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
-    // Data dikirim dari PHP (hasil query MySQL) ke JavaScript
     const labelHari  = <?= json_encode($label_hari) ?>;
     const nilaiHarian = <?= json_encode($nilai_harian) ?>;
 
