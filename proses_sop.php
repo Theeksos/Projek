@@ -1,9 +1,4 @@
 <?php
-/**
- * File: proses_sop.php
- * Fungsi: Logic Layer -> menyimpan SOP baru (INSERT) atau
- * memperbarui SOP lama (UPDATE), tergantung ada id_sop atau tidak.
- */
 
 session_start();
 require_once "config/database.php";
@@ -18,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-// Ambil & bersihkan input dari form
 $id_sop         = trim($_POST['id_sop'] ?? '');
 $judul          = trim($_POST['judul'] ?? '');
 $kategori       = trim($_POST['kategori'] ?? '');
@@ -28,7 +22,6 @@ $tanggal_update = trim($_POST['tanggal_update'] ?? date('Y-m-d'));
 $icon           = trim($_POST['icon'] ?? 'bi-journal-text');
 $langkah        = trim($_POST['langkah_langkah'] ?? '');
 
-// Validasi dasar di server
 if ($judul === '' || $kategori === '' || $deskripsi === '' || $langkah === '') {
     die("Semua field wajib diisi. <a href='javascript:history.back()'>Kembali</a>");
 }
@@ -62,7 +55,6 @@ try {
     $stmt->bindParam(':langkah', $langkah);
     $stmt->execute();
 
-    // Kalau mode tambah, arahkan ke detail SOP yang baru dibuat
     $id_tujuan = ($id_sop !== '' && ctype_digit($id_sop)) ? $id_sop : $koneksi->lastInsertId();
     header("Location: sop.php?id=" . $id_tujuan);
     exit;
