@@ -1,12 +1,4 @@
 <?php
-/**
- * File: sop.php
- * Fungsi: Halaman SOP Digital (Presentation + Logic Layer)
- * Menampilkan daftar SOP dalam bentuk kartu, bisa difilter per kategori,
- * dan menampilkan detail langkah-langkah saat salah satu SOP dipilih.
- * Sesuai halaman "5. HALAMAN SOP" pada makalah.
- */
-
 session_start();
 require_once "config/database.php";
 
@@ -17,19 +9,11 @@ if (!isset($_SESSION['id_user'])) {
 
 $halaman_aktif = "sop";
 
-// =========================================================
-// 1. Filter kategori (dari dropdown, via GET)
-// =========================================================
 $kategori_dipilih = $_GET['kategori'] ?? 'semua';
 
-// Ambil daftar kategori yang ada di database (biar dropdown otomatis update
-// kalau nanti ada kategori baru ditambahkan)
 $stmt = $koneksi->query("SELECT DISTINCT kategori FROM tb_sop ORDER BY kategori ASC");
 $daftar_kategori = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// =========================================================
-// 2. Query daftar SOP (sesuai filter kategori)
-// =========================================================
 if ($kategori_dipilih === 'semua') {
     $stmt = $koneksi->query("SELECT * FROM tb_sop ORDER BY tanggal_update DESC");
 } else {
@@ -39,9 +23,6 @@ if ($kategori_dipilih === 'semua') {
 }
 $daftar_sop = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// =========================================================
-// 3. Query detail SOP (kalau ada SOP yang diklik "Lihat")
-// =========================================================
 $sop_detail = null;
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $stmt = $koneksi->prepare("SELECT * FROM tb_sop WHERE id_sop = :id");
@@ -50,7 +31,6 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $sop_detail = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Bulan Indonesia untuk format tanggal "Mei 2026"
 $bulanIndo = [1=>"Jan",2=>"Feb",3=>"Mar",4=>"Apr",5=>"Mei",6=>"Jun",
               7=>"Jul",8=>"Agu",9=>"Sep",10=>"Okt",11=>"Nov",12=>"Des"];
 function format_tanggal_pendek($tanggal, $bulanIndo) {
@@ -91,7 +71,6 @@ function format_tanggal_pendek($tanggal, $bulanIndo) {
             </div>
         </div>
 
-        <!-- Grid kartu SOP -->
         <div class="sop-grid">
             <?php foreach ($daftar_sop as $sop): ?>
                 <?php $aktif = ($sop_detail && $sop_detail['id_sop'] == $sop['id_sop']); ?>
@@ -111,7 +90,6 @@ function format_tanggal_pendek($tanggal, $bulanIndo) {
             <?php endif; ?>
         </div>
 
-        <!-- Panel detail: hanya muncul kalau ada SOP yang dipilih -->
         <?php if ($sop_detail): ?>
         <div class="panel">
             <div class="sop-detail-header">
@@ -130,7 +108,6 @@ function format_tanggal_pendek($tanggal, $bulanIndo) {
 
             <ol class="sop-langkah-list">
                 <?php
-                // Pecah teks langkah-langkah per baris jadi item list bernomor
                 $langkah = array_filter(array_map('trim', explode("\n", $sop_detail['langkah_langkah'])));
                 foreach ($langkah as $item):
                 ?>
