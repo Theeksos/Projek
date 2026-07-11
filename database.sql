@@ -1,9 +1,4 @@
 <<<<<<< HEAD
--- =========================================================
--- Database: doughco_hub
--- Sesuai makalah: MySQL sebagai Data Layer
--- =========================================================
-=======
 
 >>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 
@@ -15,8 +10,7 @@ USE doughco_hub;
 CREATE TABLE IF NOT EXISTS tb_user (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,   -- disimpan dalam bentuk hash, BUKAN teks polos
-=======
+    password VARCHAR(255) NOT NULL,  
 CREATE TABLE IF NOT EXISTS tb_user (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -28,10 +22,7 @@ CREATE TABLE IF NOT EXISTS tb_user (
 );
 
 <<<<<<< HEAD
--- Data contoh untuk uji coba login
--- Password asli untuk ketiganya: "admin123"
--- (hash dibuat dengan password_hash() PHP, method BCRYPT)
-=======
+
 >>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 INSERT INTO tb_user (username, password, nama_lengkap, role) VALUES
 ('owner1', '$2y$10$DtnnBewmVCz7CTaVZ7DZ9.o.1elFWcrJo.LhQ4oNaOH.An7xNp8um', 'Jova (Owner)', 'owner'),
