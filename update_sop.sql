@@ -1,21 +1,15 @@
--- =========================================================
--- File: update_sop.sql
--- Fungsi: Tabel untuk fitur SOP Digital
--- Jalankan file ini SETELAH database.sql & update_laporan.sql
--- =========================================================
-
 USE doughco_hub;
 
 CREATE TABLE IF NOT EXISTS tb_sop (
     id_sop INT AUTO_INCREMENT PRIMARY KEY,
     judul VARCHAR(150) NOT NULL,
-    kategori VARCHAR(50) NOT NULL,      -- contoh: Produksi, Pelayanan, Kebersihan, Gudang
+    kategori VARCHAR(50) NOT NULL,      
     deskripsi VARCHAR(255) NOT NULL,
     versi VARCHAR(10) NOT NULL DEFAULT '1.0',
     tanggal_update DATE NOT NULL,
-    icon VARCHAR(50) NOT NULL DEFAULT 'bi-journal-text', -- class Bootstrap Icons
-    langkah_langkah TEXT NOT NULL,       -- tiap langkah dipisah baris baru (\n)
-    dibuat_oleh INT,                     -- opsional: relasi ke tb_user
+    icon VARCHAR(50) NOT NULL DEFAULT 'bi-journal-text', 
+    langkah_langkah TEXT NOT NULL,       
+    dibuat_oleh INT,                   
     FOREIGN KEY (dibuat_oleh) REFERENCES tb_user(id_user)
 );
 
