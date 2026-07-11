@@ -1,6 +1,4 @@
 <?php
-// File: dashboard_mitra.php
-// Halaman ini hanya boleh diakses jika sudah login DAN role-nya sesuai
 session_start();
 
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'mitra') {
