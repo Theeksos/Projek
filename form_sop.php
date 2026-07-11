@@ -1,10 +1,4 @@
 <?php
-/**
- * File: form_sop.php
- * Fungsi: Form untuk menambah SOP baru ATAU mengedit SOP yang sudah ada.
- * Kalau ada parameter ?id=.. di URL -> mode EDIT (form terisi otomatis).
- * Kalau tidak ada -> mode TAMBAH (form kosong).
- */
 
 session_start();
 require_once "config/database.php";
