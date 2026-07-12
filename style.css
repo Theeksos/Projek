@@ -1,0 +1,131 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background-color: #FBCFE8; /* pink pastel, background luar */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Wrapper luar: label kecil "Login" + card */
+.login-wrapper {
+    width: 100%;
+    max-width: 760px;
+}
+
+.page-label {
+    color: #ffffff;
+    opacity: 0.75;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    margin-left: 6px;
+}
+
+.login-card {
+    background-color: #FDF2F8;
+    border-radius: 22px;
+    padding: 70px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08);
+}
+
+.logo-pill {
+    width: 170px;
+    height: 46px;
+    background-color: #DB2777;
+    border-radius: 999px;
+    margin-bottom: 18px;
+}
+
+.brand-title {
+    color: #DB2777;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 340px;
+}
+
+.input-group-custom {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.input-group-custom i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d9a7c4;
+    font-size: 0.95rem;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    border: 1.5px solid #f5cfe0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    color: #4a4a4a;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-control-custom::placeholder {
+    color: #c9c9c9;
+}
+
+.form-control-custom:focus {
+    border-color: #DB2777;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background-color: #DB2777;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-login:hover {
+    background-color: #be185d;
+}
+
+.alert-error {
+    width: 100%;
+    max-width: 340px;
+    background-color: #fde2e8;
+    color: #b91c1c;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .login-card {
+        padding: 50px 24px;
+    }
+}
