@@ -6,13 +6,13 @@ if (!isset($halaman_aktif)) {
 
 $menu = [
     "dashboard" => ["Dashboard", "dashboard_owner.php", "bi-grid-1x2-fill"],
-    "kios"      => ["Kios",      "#", "bi-shop"],
-    "produk"    => ["Produk",    "#", "bi-box-seam"],
-    "stok"      => ["Stok",      "#", "bi-clipboard-data"],
-    "staf"      => ["Staf",      "#", "bi-people-fill"],
+    "kios"      => ["Kios",      "kios.php", "bi-shop"],
+    "produk"    => ["Produk",    "produk.php", "bi-box-seam"],
+    "stok"      => ["Stok",      "stok.php", "bi-clipboard-data"],
+    "staf"      => ["Staf",      "staff.php", "bi-people-fill"],
     "laporan"   => ["Laporan",   "laporan.php", "bi-bar-chart-fill"],
     "sop"       => ["SOP",       "sop.php", "bi-journal-text"],
-    "mitra"     => ["Mitra",     "#", "bi-diagram-3-fill"],
+    "mitra"     => ["Mitra",     "mitra.php", "bi-diagram-3-fill"],
 ];
 
 $nama_user = $_SESSION['nama'] ?? 'User';

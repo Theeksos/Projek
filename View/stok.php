@@ -1,170 +1,148 @@
 <?php
 session_start();
-require_once "../Logic/database.php"; 
+require_once "../config/database.php"; 
 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    // 1. Query ambil data sesuai kolom baru tabel bahan_baku
+    // 1. Query langsung ke tabel bahan_baku tanpa relasi ke tabel lain
+    $query_str = "SELECT * FROM bahan_baku";
+    
     if (!empty($search)) {
-        $query = "SELECT * FROM bahan_baku WHERE nama LIKE :search ORDER BY id ASC";
-        $stmt = $koneksi->prepare($query);
+        $query_str .= " WHERE nama LIKE :search ORDER BY id DESC";
+        $stmt = $koneksi->prepare($query_str);
         $search_param = "%" . $search . "%";
         $stmt->bindParam(':search', $search_param);
     } else {
-        $query = "SELECT * FROM bahan_baku ORDER BY id ASC";
-        $stmt = $koneksi->prepare($query);
+        $query_str .= " ORDER BY id DESC";
+        $stmt = $koneksi->prepare($query_str);
     }
     
     $stmt->execute();
-    $data_stok = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $all_stok = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Logika Hitung 4 Bar Summary secara Dinamis
-    $total_stok = count($data_stok);
+    // 2. Hitung ringkasan data berdasarkan nilai ROP secara dinamis
+    $total_jenis = count($all_stok);
     
-    // Aktif: Jumlah masih di atas 100 dan di atas ROP
-    $stok_aktif = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah > 100 AND jumlah > rop")->fetchColumn();
-    
-    // Kritis: Jumlah sudah menyentuh atau di bawah ROP
+    // Stok kritis jika jumlah kurang dari atau sama dengan nilai ROP ($jumlah \le ROP$)
     $stok_kritis = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah <= rop")->fetchColumn();
     
-    // Hampir Habis: Jumlah turun setengah (<= 100) tapi masih di atas ROP
-    $stok_hampir = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah <= 100 AND jumlah > rop")->fetchColumn();
+    // Stok aman jika jumlah berada di atas nilai ROP ($jumlah > ROP$)
+    $stok_aman = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah > rop")->fetchColumn();
 
 } catch (PDOException $e) {
-    die("Gagal mengambil data stok: " . $e->getMessage());
+    die("Gagal mengambil data bahan baku: " . $e->getMessage());
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - Stok Bahan Baku</title>
+    <!-- Aturan Link Aset untuk View Utama -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../Assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../Assets/css/dashboard.css">
+    <style>
+        .input-search-custom {
+            border: 1px solid #f0d3e3;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            background-color: #ffffff;
+            color: #374151;
+            width: 220px;
+        }
+        .input-search-custom:focus {
+            outline: none;
+            border-color: #DB2777;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-2 sidebar">
-            <div class="brand-title">Dough & Co</div>
-            <nav class="nav flex-column">
-                <a class="nav-link-custom" href="#">Dashboard</a>
-                <a class="nav-link-custom" href="kios.php">Kios</a>
-                <a class="nav-link-custom" href="#">Produk</a>
-                <a class="nav-link-custom active" href="stok.php">Stok</a>
-                <a class="nav-link-custom" href="staff.php">Staff</a>
-                <a class="nav-link-custom" href="#">Laporan</a>
-                <a class="nav-link-custom" href="#">Transaksi</a>
-                <hr style="border-color: #FF3377; margin: 1rem 0;">
-                <a class="nav-link-custom" href="#">Mitra</a>
-                <a class="nav-link-custom" href="#">SOP</a>
-                <button class="btn btn-logout">Logout</button>
-            </nav>
+<div class="app-layout">
+    
+    <!-- Include Sidebar Utama -->
+    <?php include "../includes/sidebar.php"; ?>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        
+        <!-- TOPBAR ACTION -->
+        <div class="page-topbar">
+            <h4>Manajemen Stok Bahan Baku</h4>
+            <div class="topbar-actions">
+                <form action="" method="GET" style="display: flex; gap: 8px;">
+                    <input type="text" name="search" class="input-search-custom" placeholder="Cari nama bahan..." value="<?= htmlspecialchars($search); ?>">
+                </form>
+                <a href="form/stok.php" class="btn-export">+ Tambah Bahan</a>
+            </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="col-md-10 main-content">
+        <!-- 3 COLUMNS STAT GRID REVISI -->
+        <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-card stat-pink">
+                <div class="stat-label">JENIS STOK (VARIAN)</div>
+                <div class="stat-value"><?= $total_jenis; ?></div>
+            </div>
+            <div class="stat-card stat-green">
+                <div class="stat-label">STOK AMAN (> ROP)</div>
+                <div class="stat-value"><?= $stok_aman; ?></div>
+            </div>
+            <div class="stat-card stat-orange">
+                <div class="stat-label">STOK KRITIS (<= ROP)</div>
+                <div class="stat-value"><?= $stok_kritis; ?></div>
+            </div>
+        </div>
+
+        <!-- TABLE PANEL -->
+        <div class="panel">
+            <div class="panel-title">Daftar Inventaris Bahan Baku</div>
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="page-title">Manajemen Bahan Baku</h2>
-                <div class="d-flex gap-2">
-                    <form action="" method="GET" class="d-flex gap-2">
-                        <input type="text" name="search" class="form-control search-input" placeholder="cari bahan baku..." value="<?= htmlspecialchars($search); ?>">
-                    </form>                    
-                    <a href="../Logic/form/stok.php" class="btn btn-pink">+ Tambah Bahan Baku</a>
-                </div>
-            </div>
-
-            <!-- 4 BAR SUMMARY CARDS -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card summary-card card-total-stok">
-                        <div class="card-label">Total Stok</div>
-                        <div class="card-value"><?= $total_stok; ?></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card summary-card card-aktif">
-                        <div class="card-label">Aktif</div>
-                        <div class="card-value"><?= $stok_aktif; ?></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card summary-card card-kritis">
-                        <div class="card-label">Stok Kritis</div>
-                        <div class="card-value"><?= $stok_kritis; ?></div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card summary-card card-warning">
-                        <div class="card-label">Hampir Habis</div>
-                        <div class="card-value"><?= $stok_hampir; ?></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLE CONTAINER -->
-            <div class="table-container">
-                <table class="table align-middle">
-                    <thead>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Nama Bahan Baku</th>
+                        <th>Jumlah Stok</th>
+                        <th>Satuan</th>
+                        <th>Batas ROP</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($all_stok)): ?>
                         <tr>
-                            <th scope="col" style="width: 25%;">Nama Bahan</th>
-                            <th scope="col" style="width: 15%;">Stok</th>
-                            <th scope="col" style="width: 15%;">ROP</th>
-                            <th scope="col" style="width: 30%;">Status</th>
-                            <th scope="col" class="text-center" style="width: 15%;">Aksi</th>
+                            <td colspan="6" style="text-align: center; color: #9ca3af; padding: 20px;">Tidak ada data bahan baku ditemukan.</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($data_stok)): ?>
+                    <?php else: ?>
+                        <?php foreach ($all_stok as $row): ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">Belum ada data stok bahan baku.</td>
+                                <td style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($row['nama']); ?></td>
+                                <td style="font-weight: 600;"><?= number_format($row['jumlah'], 0, ',', '.'); ?></td>
+                                <td><?= htmlspecialchars($row['satuan'] ?? 'Gram'); ?></td>
+                                <td style="color: #6b7280; font-weight: 500;"><?= number_format($row['rop'], 0, ',', '.'); ?></td>
+                                <td>
+                                    <?php if ($row['jumlah'] <= $row['rop']): ?>
+                                        <span class="badge-down"><i class="bi bi-exclamation-triangle-fill"></i> Kritis</span>
+                                    <?php else: ?>
+                                        <span class="badge-up"><i class="bi bi-check-circle-fill"></i> Aman</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <a href="form/stok.php?id=<?= $row['id']; ?>" class="btn-outline-pink">Edit</a>
+                                </td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($data_stok as $row): 
-                                $stok_skrg = (float)$row['jumlah'];
-                                $rop_skrg  = (float)$row['rop'];
-                                $satuan    = $row['satuan'];
-                                
-                                // Progress bar berdasarkan kapasitas MAX 200
-                                $persen = ($stok_skrg / 200) * 100;
-                                if($persen > 100) $persen = 100;
-                                if($persen < 0) $persen = 0;
-
-                                if ($stok_skrg <= $rop_skrg) {
-                                    $bar_color = "bg-stok-kritis"; // Merah
-                                } elseif ($stok_skrg <= 100) {
-                                    $bar_color = "bg-stok-warning"; // Kuning
-                                } else {
-                                    $bar_color = "bg-stok-aman"; // Hijau
-                                }
-                            ?>
-                                <tr>
-                                    <td class="fw-bold text-dark"><?= htmlspecialchars($row['nama']); ?></td>
-                                    <td class="fw-semibold"><?= $stok_skrg . ' ' . $satuan; ?></td>
-                                    <td class="text-secondary fw-semibold"><?= $rop_skrg . ' ' . $satuan; ?></td>
-                                    <td>
-                                        <div class="progress w-100">
-                                            <div class="progress-bar <?= $bar_color; ?>" role="progressbar" style="width: <?= $persen; ?>%"></div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="../Logic/form/stok.php?id=<?= $row['id']; ?>" class="btn btn-outline-pink">Edit</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-    </div>
+
+    </main>
 </div>
 
 </body>

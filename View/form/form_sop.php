@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once "config/database.php";
+require_once "../../config/database.php";
 
 if (!isset($_SESSION['id_user'])) {
     header("Location: login.php");
@@ -46,17 +46,17 @@ $pilihan_icon = [
     <title><?= $mode_edit ? 'Edit SOP' : 'Tambah SOP' ?> - Dough & Co Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../Assets/css/dashboard.css">
 </head>
 <body>
 <div class="app-layout">
 
-    <?php include "includes/sidebar.php"; ?>
+    <?php include "../../includes/sidebar.php"; ?>
 
     <main class="main-content">
         <div class="page-topbar">
             <h4><?= $mode_edit ? 'Edit SOP' : 'Tambah SOP Baru' ?></h4>
-            <a href="sop.php" class="btn-outline-pink"><i class="bi bi-arrow-left"></i> Kembali</a>
+            <a href="../sop.php" class="btn-outline-pink"><i class="bi bi-arrow-left"></i> Kembali</a>
         </div>
 
         <div class="panel" style="max-width:640px;">

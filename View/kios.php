@@ -1,156 +1,176 @@
 <?php
 session_start();
-require_once "../Logic/database.php"; 
+require_once "../config/database.php"; 
+
+if (!isset($_SESSION['id_user'])) {
+    header("Location: login.php");
+    exit;
+}
 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    $base_query = "SELECT k.*, u.nama_lengkap AS nama_mitra, 
-                   COUNT(s.id_staff) AS jumlah_staff 
-                   FROM kios k
-                   LEFT JOIN tb_user u ON k.id_mitra = u.id_user
-                   LEFT JOIN staff s ON k.id_kios = s.id_kios";
-
+    // 1. Query ambil data kios + gabung nama pemilik dari tb_user
+    $query_str = "SELECT k.*, u.nama_lengkap AS nama_pemilik 
+                  FROM kios k 
+                  LEFT JOIN tb_user u ON k.id_mitra = u.id_user";
+                  
     if (!empty($search)) {
-        $query = $base_query . " WHERE k.nama_kios LIKE :search GROUP BY k.id_kios ORDER BY k.id_kios ASC";
-        $stmt = $koneksi->prepare($query);
+        $query_str .= " WHERE k.nama_kios LIKE :search OR u.nama_lengkap LIKE :search ORDER BY k.id_kios ASC";
+        $stmt = $koneksi->prepare($query_str);
         $search_param = "%" . $search . "%";
         $stmt->bindParam(':search', $search_param);
     } else {
-        $query = $base_query . " GROUP BY k.id_kios ORDER BY k.id_kios ASC";
-        $stmt = $koneksi->prepare($query);
+        $query_str .= " ORDER BY k.id_kios ASC";
+        $stmt = $koneksi->prepare($query_str);
     }
     
     $stmt->execute();
     $data_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Hitung Summary
+    // 2. Hitung data untuk 4 blok Stat Grid secara dinamis
+    // 2. Hitung data untuk 4 blok Stat Grid secara dinamis
     $total_kios = count($data_kios);
-    $total_buka = $koneksi->query("SELECT COUNT(*) FROM kios WHERE status = 'buka'")->fetchColumn();
-    $total_omset = $koneksi->query("SELECT SUM(pendapatan) FROM kios")->fetchColumn() ?: 0;
+    
+    // Hitung Kios Buka dan Tutup berdasarkan kolom status
+    $kios_buka  = $koneksi->query("SELECT COUNT(*) FROM kios WHERE status = 'buka'")->fetchColumn();
+    $kios_tutup = $koneksi->query("SELECT COUNT(*) FROM kios WHERE status = 'tutup'")->fetchColumn();
+    
+    // Total Pendapatan / Omset
+    $total_omset = $koneksi->query("SELECT SUM(pendapatan) FROM kios")->fetchColumn() ?? 0;
 
 } catch (PDOException $e) {
-    die("Gagal mengambil data: " . $e->getMessage());
+    die("Gagal memuat data kios: " . $e->getMessage());
 }
+
+// Inisial untuk user login di pojok kiri bawah (Dummy / Sesuai Session Ryan)
+$user_login = $_SESSION['nama_user'] ?? 'Ryan';
+$user_role  = $_SESSION['role_user'] ?? 'Mitra';
+$inisial_user = strtoupper(substr($user_login, 0, 1));
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dough & Co - Kios</title>
+    <title>Dough & Co - Manajemen Kios</title>
+    <!-- Tetap bawa Bootstrap hanya untuk utilitas form grid & spasi jika dibutuhkan -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../Assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../Assets/css/dashboard.css">
+    <!-- Tambahan input search manual agar selaras dengan style template baru -->
+    <style>
+        .input-search-custom {
+            border: 1px solid #f0d3e3;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            background-color: #ffffff;
+            color: #374151;
+            width: 220px;
+        }
+        .input-search-custom:focus {
+            outline: none;
+            border-color: #DB2777;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-2 sidebar">
-            <div class="brand-title">Dough & Co</div>
-            <nav class="nav flex-column">
-                <a class="nav-link-custom" href="#">Dashboard</a>
-                <a class="nav-link-custom active" href="kios.php">Kios</a>
-                <a class="nav-link-custom" href="#">Produk</a>
-                <a class="nav-link-custom" href="stok.php">Stok</a>
-                <a class="nav-link-custom" href="staff.php">Staff</a>
-                <a class="nav-link-custom" href="#">Laporan</a>
-                <a class="nav-link-custom" href="#">Transaksi</a>
-                <hr style="border-color: #FF3377; margin: 1rem 0;">
-                <a class="nav-link-custom" href="#">Mitra</a>
-                <a class="nav-link-custom" href="#">SOP</a>
-                <button class="btn btn-logout">Logout</button>
-            </nav>
+<div class="app-layout">
+    
+    <!-- SIDEBAR BARU -->
+    <?php include "../includes/sidebar.php"; ?>
+
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        
+        <!-- TOPBAR ACTION -->
+        <div class="page-topbar">
+            <h4>Manajemen Data Kios</h4>
+            <div class="topbar-actions">
+                <form action="" method="GET" style="display: flex; gap: 8px;">
+                    <input type="text" name="search" class="input-search-custom" placeholder="Cari kios atau pemilik..." value="<?= htmlspecialchars($search); ?>">
+                </form>
+                <a href="form/kios.php" class="btn-export">+ Tambah Kios</a>
+            </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="col-md-10 main-content">
+        <!-- 4 COLUMNS STAT GRID REVISI -->
+        <div class="stat-grid">
+            <div class="stat-card stat-pink">
+                <div class="stat-label">TOTAL KIOS</div>
+                <div class="stat-value"><?= $total_kios; ?></div>
+            </div>
+            <div class="stat-card stat-green">
+                <div class="stat-label">KIOS BUKA</div>
+                <div class="stat-value"><?= $kios_buka; ?></div>
+            </div>
+            <div class="stat-card stat-orange">
+                <div class="stat-label">KIOS TUTUP</div>
+                <div class="stat-value"><?= $kios_tutup; ?></div>
+            </div>
+            <div class="stat-card stat-blue">
+                <div class="stat-label">TOTAL PENDAPATAN</div>
+                <div class="stat-value">Rp<?= number_format($total_omset, 0, ',', '.'); ?></div>
+            </div>
+        </div>
+
+        <!-- TABLE PANEL -->
+        <div class="panel">
+            <div class="panel-title">Daftar Kios Dough & Co</div>
             
-            <!-- HEADER SEARCH & BUTTON -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="page-title">Manajemen Data Kios</h2>
-                <div class="d-flex gap-2">
-                    <form action="" method="GET" class="d-flex gap-2">
-                        <input type="text" name="search" class="form-control search-input" placeholder="cari nama kios..." value="<?= htmlspecialchars($search); ?>">
-                    </form>                    
-                    <a href="../Logic/form/kios.php" class="btn btn-pink">+ Tambah Kios Baru</a>
-                </div>
-            </div>
-
-            <!-- CARDS (5 Kolom Mini Sesuai Layout Figma) -->
-            <div class="row g-3 mb-4">
-                <div class="col">
-                    <div class="card summary-card card-total-stok">
-                        <div class="card-label">Total Kios</div>
-                        <div class="card-value"><?= $total_kios; ?></div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card summary-card card-aktif">
-                        <div class="card-label">Kios Buka</div>
-                        <div class="card-value"><?= $total_buka; ?></div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card summary-card card-kritis">
-                        <div class="card-label">Kios Tutup</div>
-                        <div class="card-value"><?= $total_kios - $total_buka; ?></div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card summary-card card-warning">
-                        <div class="card-label">Total Omset</div>
-                        <div class="card-value" style="font-size: 1.8rem; font-weight:800;">Rp <?= number_format($total_omset, 0, ',', '.'); ?></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLE CONTAINER -->
-            <div class="table-container">
-                <table class="table align-middle">
-                    <thead>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Nama Kios</th>
+                        <th>Alamat / Lokasi</th>
+                        <th>Pemilik (Mitra)</th>
+                        <th>Pendapatan</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($data_kios)): ?>
                         <tr>
-                            <th scope="col">Nama Kios</th>
-                            <th scope="col">Lokasi</th>
-                            <th scope="col">Mitra Penanggung Jawab</th>
-                            <th scope="col">Total Pendapatan</th>
-                            <th scope="col" class="text-center">Jumlah Staff</th>
-                            <th scope="col" class="text-center">Status</th>
-                            <th scope="col" class="text-center">Aksi</th>
+                            <td colspan="5" style="text-align: center; color: #9ca3af; padding: 20px;">Belum ada data kios yang tersedia.</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($data_kios)): ?>
+                    <?php else: ?>
+                        <?php foreach ($data_kios as $row): ?>
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Tidak ada data kios ditemukan.</td>
+                                <td style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($row['nama_kios']); ?></td>
+                                <td><?= htmlspecialchars($row['lokasi']); ?></td>
+                                <td>
+                                    <span style="font-weight: 500;">
+                                        <?= htmlspecialchars($row['nama_pemilik'] ?? 'Tidak Ada Pemilik'); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-up">
+                                        Rp<?= number_format($row['pendapatan'], 0, ',', '.'); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php if ($row['status'] == 'buka'): ?>
+                                        <span class="badge-up">● Buka</span>
+                                    <?php else: ?>
+                                        <span class="badge-down">● Tutup</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <a href="form/kios.php?id=<?= $row['id_kios']; ?>" class="btn-outline-pink">Edit</a>
+                                </td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($data_kios as $row): ?>
-                                <tr>
-                                    <td class="fw-bold text-dark"><?= htmlspecialchars($row['nama_kios']); ?></td>
-                                    <td><?= htmlspecialchars($row['lokasi']); ?></td>
-                                    <td><span class="fw-semibold text-secondary"><?= htmlspecialchars($row['nama_mitra'] ?? 'Belum Ditunjuk'); ?></span></td>
-                                    <td class="text-success fw-bold">Rp <?= number_format($row['pendapatan'], 0, ',', '.'); ?></td>
-                                    <td class="text-center fw-bold"><?= $row['jumlah_staff']; ?> Orang</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill px-3 py-2 <?= $row['status'] == 'buka' ? 'bg-success' : 'bg-danger'; ?>">
-                                            <?= ucfirst($row['status']); ?>
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="../Logic/form/kios.php?id=<?= $row['id_kios']; ?>" class="btn btn-outline-pink">Edit</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-    </div>
+
+    </main>
 </div>
 
 </body>

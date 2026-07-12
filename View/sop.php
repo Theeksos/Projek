@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "config/database.php";
+require_once "../config/database.php";
 
 if (!isset($_SESSION['id_user'])) {
     header("Location: login.php");
@@ -46,12 +46,12 @@ function format_tanggal_pendek($tanggal, $bulanIndo) {
     <title>SOP Digital - Dough & Co Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="../Assets/css/dashboard.css">
 </head>
 <body>
 <div class="app-layout">
 
-    <?php include "includes/sidebar.php"; ?>
+    <?php include "../includes/sidebar.php"; ?>
 
     <main class="main-content">
         <div class="page-topbar">
@@ -67,7 +67,7 @@ function format_tanggal_pendek($tanggal, $bulanIndo) {
                         <?php endforeach; ?>
                     </select>
                 </form>
-                <a href="form_sop.php" class="btn-export"><i class="bi bi-plus-lg"></i> Tambah SOP</a>
+                <a href="form/form_sop.php" class="btn-export"><i class="bi bi-plus-lg"></i> Tambah SOP</a>
             </div>
         </div>
 

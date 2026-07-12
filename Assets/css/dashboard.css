@@ -234,3 +234,119 @@ body {
 
 .badge-up   { color: #16a34a; font-weight: 600; }
 .badge-down { color: #dc2626; font-weight: 600; }
+
+.sop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+    .sop-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .sop-grid { grid-template-columns: 1fr; }
+}
+
+.sop-card {
+    background-color: #ffffff;
+    border: 1px solid #f6e0ec;
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sop-card.is-active {
+    border-color: #DB2777;
+    box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.15);
+}
+
+.sop-icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background-color: #fce7f3;
+    color: #DB2777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+
+.sop-card .sop-title {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 0.98rem;
+}
+
+.sop-card .sop-desc {
+    color: #9ca3af;
+    font-size: 0.83rem;
+    flex-grow: 1;
+}
+
+.sop-card .sop-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: #9ca3af;
+}
+
+.btn-lihat {
+    background-color: #fce7f3;
+    color: #DB2777;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+.btn-lihat:hover { background-color: #DB2777; color: #fff; }
+
+/* Detail panel SOP */
+.sop-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.btn-outline-pink {
+    border: 1.5px solid #DB2777;
+    color: #DB2777;
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+.btn-outline-pink:hover { background-color: #fce7f3; }
+
+.sop-langkah-list {
+    padding-left: 20px;
+    margin: 0;
+}
+.sop-langkah-list li {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.select-kategori {
+    border: 1px solid #f0d3e3;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    background-color: #ffffff;
+    color: #374151;
+}
+

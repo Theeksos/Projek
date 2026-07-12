@@ -1,18 +1,11 @@
 <?php
-<<<<<<< HEAD
-
 session_start();
 
-session_start();
-
->>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 if (isset($_SESSION['id_user'])) {
-    header("Location: dashboard.php");
+    header("Location: ../View/dashboard.php");
     exit;
 }
 
-<<<<<<< HEAD
->>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
 $error = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 ?>
@@ -23,13 +16,9 @@ unset($_SESSION['login_error']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Dough & Co Hub</title>
 
-<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
->>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../Assets/css/style.css">
 </head>
 <body>
 
@@ -45,7 +34,7 @@ unset($_SESSION['login_error']);
                 <div class="alert-error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
-            <form class="login-form" action="proses_login.php" method="POST" id="formLogin">
+            <form class="login-form" action="../Logic/proses_login.php" method="POST" id="formLogin">
                 <div class="input-group-custom">
                     <i class="bi bi-person-fill"></i>
                     <input type="text" name="username" id="username"
@@ -62,9 +51,7 @@ unset($_SESSION['login_error']);
             </form>
         </div>
     </div>
-<<<<<<< HEAD
 
->>>>>>> 062a1b73ba1e9441c6e8aa42e9f05ef9d199fae4
-    <script src="assets/js/validasi.js"></script>
+    <script src="../Assets/js/validasi.js"></script>
 </body>
 </html>
