@@ -7,6 +7,8 @@ if (!isset($_SESSION['id_user'])) {
     exit;
 }
 
+$halaman_aktif = "kios";
+
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
