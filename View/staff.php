@@ -13,7 +13,6 @@ $halaman_aktif = "staf";
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    // Query dasar menggabungkan tabel staff dengan tabel kios
     $base_query = "SELECT s.*, k.nama_kios 
                    FROM staff s
                    LEFT JOIN kios k ON s.id_kios = k.id_kios";
@@ -31,7 +30,6 @@ try {
     $stmt->execute();
     $all_staff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Hitung Ringkasan Data Staff
     $total_staff = count($all_staff);
     
     $staff_active = $koneksi->query("SELECT COUNT(*) FROM staff WHERE status = 'active'")->fetchColumn();
@@ -41,7 +39,6 @@ try {
     die("Gagal mengambil data staff: " . $e->getMessage());
 }
 
-// Data info user di pojok kiri bawah
 $user_login = $_SESSION['nama_user'] ?? 'Ryan';
 $user_role  = $_SESSION['role_user'] ?? 'Mitra';
 $inisial_user = strtoupper(substr($user_login, 0, 1));

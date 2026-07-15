@@ -17,7 +17,6 @@ $shift         = 'Pagi';
 $jenis_kelamin = 'Laki-laki';
 $status        = 'active';
 
-// --- 1. AMBIL DATA KIOS UNTUK DROPDOWN ---
 try {
     $stmt_kios = $koneksi->query("SELECT id_kios, nama_kios FROM kios ORDER BY nama_kios ASC");
     $list_kios = $stmt_kios->fetchAll(PDO::FETCH_ASSOC);
@@ -25,7 +24,6 @@ try {
     die("Gagal mengambil data kios: " . $e->getMessage());
 }
 
-// --- 2. LOGIKA DETEKSI MODE EDIT ---
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $is_edit = true;
     $id_staff = $_GET['id'];
@@ -51,7 +49,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     }
 }
 
-// --- 3. LOGIKA PROSES SIMPAN (INSERT / UPDATE) ---
 if (isset($_POST['simpan'])) {
     $form_id_staff   = $_POST['id_staff'];
     $nama_staff      = trim($_POST['nama_staff']);
@@ -62,13 +59,11 @@ if (isset($_POST['simpan'])) {
 
     try {
         if (!empty($form_id_staff)) {
-            // Jalur Update
             $sql = "UPDATE staff SET nama_staff = :nama, id_kios = :id_kios, shift = :shift, jenis_kelamin = :jk, status = :status WHERE id_staff = :id";
             $stmt = $koneksi->prepare($sql);
             $stmt->bindParam(':id', $form_id_staff);
             $pesan_sukses = "Data staff berhasil diperbarui!";
         } else {
-            // Jalur Insert
             $sql = "INSERT INTO staff (nama_staff, id_kios, shift, jenis_kelamin, status) VALUES (:nama, :id_kios, :shift, :jk, :status)";
             $stmt = $koneksi->prepare($sql);
             $pesan_sukses = "Staff baru berhasil ditambahkan!";
@@ -96,12 +91,10 @@ if (isset($_POST['simpan'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $is_edit ? "Edit Staff" : "Tambah Staff"; ?> - Dough & Co</title>
-    <!-- CSS Mundur 2 Kali -->
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../../Assets/css/dashboard.css">
     
-    <!-- CSS Tambahan Khusus Elemen Form (Terpisah) -->
     <style>
         .form-container-custom {
             max-width: 600px;
@@ -159,13 +152,12 @@ if (isset($_POST['simpan'])) {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar Mundur 2 Kali -->
     <?php include "../../includes/sidebar.php"; ?>
 
     <!-- Main Content Sisi Kanan -->
     <main class="main-content">
         
-        <!-- Topbar dengan Tombol Kembali di Samping Judul -->
+        <!-- Topbar -->
         <div class="page-topbar">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <a href="../staff.php" class="btn-lihat" style="padding: 6px 12px;">← Kembali</a>
@@ -173,23 +165,20 @@ if (isset($_POST['simpan'])) {
             </div>
         </div>
 
-        <!-- Panel Form Dashboard Layout -->
+        <!-- Panel -->
         <div class="panel form-container-custom">
             <div class="panel-title" style="margin-bottom: 18px; border-bottom: 1px solid #f6e0ec; padding-bottom: 8px;">
                 Formulir Informasi Data Staff
             </div>
             
             <form action="" method="POST">
-                <!-- Hidden input ID untuk mode edit -->
                 <input type="hidden" name="id_staff" value="<?= $id_staff; ?>">
 
-                <!-- Nama Staff -->
                 <div class="form-group-custom">
                     <label class="label-custom">Nama Lengkap Staff</label>
                     <input type="text" name="nama_staff" class="input-custom" placeholder="Tulis nama lengkap karyawan..." value="<?= htmlspecialchars($nama_staff); ?>" required>
                 </div>
 
-                <!-- Dropdown Kios Penugasan -->
                 <div class="form-group-custom">
                     <label class="label-custom">Kios Tempat Penugasan</label>
                     <select name="id_kios" class="input-custom">
@@ -202,7 +191,6 @@ if (isset($_POST['simpan'])) {
                     </select>
                 </div>
 
-                <!-- Shift Kerja -->
                 <div class="form-group-custom">
                     <label class="label-custom">Shift Kerja</label>
                     <select name="shift" class="input-custom" required>
@@ -213,7 +201,6 @@ if (isset($_POST['simpan'])) {
                     </select>
                 </div>
 
-                <!-- Jenis Kelamin -->
                 <div class="form-group-custom">
                     <label class="label-custom">Jenis Kelamin</label>
                     <select name="jenis_kelamin" class="input-custom" required>
@@ -222,7 +209,6 @@ if (isset($_POST['simpan'])) {
                     </select>
                 </div>
 
-                <!-- Status Kerja (Active/Off) -->
                 <div class="form-group-custom">
                     <label class="label-custom">Status Keaktifan Kerja</label>
                     <select name="status" class="input-custom" required>
@@ -231,7 +217,6 @@ if (isset($_POST['simpan'])) {
                     </select>
                 </div>
 
-                <!-- Tombol Submit Form -->
                 <div class="form-actions-custom">
                     <a href="../staff.php" class="btn-cancel-custom">Batal</a>
                     <button type="submit" name="simpan" class="btn-export">

@@ -27,7 +27,6 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     }
 }
 
-// Daftar pilihan ikon yang tersedia (Bootstrap Icons)
 $pilihan_icon = [
     'bi-book-fill' => 'Buku (Adonan/Resep)',
     'bi-fire' => 'Api (Penggorengan/Panggang)',

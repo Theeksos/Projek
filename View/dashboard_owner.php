@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. Proteksi Halaman: Hanya Owner/Admin yang boleh masuk
 if (!isset($_SESSION['role']) || (strtolower($_SESSION['role']) !== 'owner' && strtolower($_SESSION['role']) !== 'admin')) {
     header("Location: ../login.php"); 
     exit;
@@ -9,27 +8,18 @@ if (!isset($_SESSION['role']) || (strtolower($_SESSION['role']) !== 'owner' && s
 
 require_once "../config/database.php"; 
 
-// Tentukan menu aktif untuk sidebar
 $halaman_aktif = "dashboard";
 
 try {
-    // --- 2. AMBIL DATA STATISTIK UTAMA (Use Case: Akses Laporan & Kelola Mitra) ---
-    // A. Total Pendapatan Seluruh Kios (Simulasi / Jika ada tabel transaksi)
-    // $total_pendapatan = $koneksi->query("SELECT SUM(total_harga) FROM transaksi")->fetchColumn() ?? 0;
-    $total_pendapatan = 24500000; // Representasi visual awal rupiah
+    $total_pendapatan = 24500000;
 
-    // B. Total Mitra Aktif (Use Case: Kelola Data Mitra)
     $total_mitra = $koneksi->query("SELECT COUNT(*) FROM tb_user WHERE role = 'Mitra'")->fetchColumn() ?? 0;
 
-    // C. Total Produk Terdaftar (Use Case: Kelola Data Produk)
     $total_produk = $koneksi->query("SELECT COUNT(*) FROM produk")->fetchColumn() ?? 0;
 
-    // D. Total SOP Digital Terbit (Use Case: Kelola & Akses SOP)
     $total_sop = $koneksi->query("SELECT COUNT(*) FROM tb_sop")->fetchColumn() ?? 0;
 
 
-    // --- 3. QUERY DAFTAR MITRA TERBARU (Use Case: Kelola Data Mitra) ---
-    // Mengambil daftar user dengan role Mitra
     $stmt_mitra = $koneksi->query("
         SELECT id_user, nama_lengkap
         FROM tb_user 
@@ -39,8 +29,6 @@ try {
     $list_mitra = $stmt_mitra->fetchAll(PDO::FETCH_ASSOC);
 
 
-    // --- 4. QUERY PRODUK DENGAN STOK MENIPIS (Use Case: Kelola Data Produk) ---
-    // Membantu owner memantau produk yang butuh perhatian khusus
     $stmt_produk_kritis = $koneksi->query("
         SELECT nama, stok, rop 
         FROM produk 
@@ -60,7 +48,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - Owner Dashboard</title>
-    <!-- Link Aset Global -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Assets/css/dashboard.css">
@@ -69,7 +56,6 @@ try {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar Terfilter -->
     <?php include "../includes/sidebar.php"; ?>
 
     <!-- MAIN CONTENT -->
@@ -90,22 +76,18 @@ try {
 
         <!-- 4 STAT CARDS (Menggunakan Grid bawaan CSS global) -->
         <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); gap: 16px;">
-            <!-- Stat 1: Pendapatan Global (Use Case: Laporan) -->
             <div class="stat-card stat-pink">
                 <div class="stat-label">OMSET SELURUH KIOS</div>
                 <div class="stat-value" style="font-size: 1.4rem;">Rp <?= number_format($total_pendapatan, 0, ',', '.'); ?></div>
             </div>
-            <!-- Stat 2: Total Mitra (Use Case: Kelola Mitra) -->
             <div class="stat-card" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe;">
                 <div class="stat-label" style="color: #7c3aed;">MITRA BERGABUNG</div>
                 <div class="stat-value" style="color: #7c3aed;"><?= $total_mitra; ?> <span style="font-size: 0.9rem; font-weight: normal;">Partner</span></div>
             </div>
-            <!-- Stat 3: Total Produk (Use Case: Kelola Produk) -->
             <div class="stat-card stat-orange">
                 <div class="stat-label">VARIAN PRODUK</div>
                 <div class="stat-value"><?= $total_produk; ?> <span style="font-size: 0.9rem; font-weight: normal; color: #d97706;">Menu</span></div>
             </div>
-            <!-- Stat 4: Total SOP (Use Case: Kelola SOP) -->
             <div class="stat-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0;">
                 <div class="stat-label" style="color: #16a34a;">SOP DIGITAL</div>
                 <div class="stat-value" style="color: #16a34a;"><?= $total_sop; ?> <span style="font-size: 0.9rem; font-weight: normal;">Dokumen</span></div>
@@ -115,7 +97,6 @@ try {
         <!-- TWO COLUMN LAYOUT -->
         <div class="row g-4 mt-2">
             
-            <!-- Kiri: Kelola Data Mitra (Use Case: Kelola Data Mitra) -->
             <div class="col-lg-7">
                 <div class="panel h-100">
                     <div class="panel-header-custom">
@@ -155,7 +136,6 @@ try {
                 </div>
             </div>
 
-            <!-- Kanan: Monitoring Stok Produk & SOP (Use Case: Kelola Produk & SOP) -->
             <div class="col-lg-5">
                 <div class="panel h-100 d-flex flex-column justify-content-between">
                     <div>
@@ -183,7 +163,6 @@ try {
                         </div>
                     </div>
 
-                    <!-- Shortcut Use Case: Kelola & Akses SOP Digital -->
                     <div class="sop-shortcut-owner mt-4 pt-3 border-top">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>

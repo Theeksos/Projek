@@ -16,7 +16,6 @@ $jumlah     = 0;
 $satuan     = 'Gram';
 $rop        = 0;
 
-// --- 1. LOGIKA DETEKSI MODE EDIT ---
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $is_edit = true;
     $id = $_GET['id'];
@@ -41,7 +40,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     }
 }
 
-// --- 2. LOGIKA PROSES SIMPAN (INSERT / UPDATE) ---
 if (isset($_POST['simpan'])) {
     $form_id = $_POST['id'];
     $nama    = trim($_POST['nama']);
@@ -51,13 +49,11 @@ if (isset($_POST['simpan'])) {
 
     try {
         if (!empty($form_id)) {
-            // Jalur Update
             $sql = "UPDATE bahan_baku SET nama = :nama, jumlah = :jumlah, satuan = :satuan, rop = :rop WHERE id = :id";
             $stmt = $koneksi->prepare($sql);
             $stmt->bindParam(':id', $form_id);
             $pesan_sukses = "Data bahan baku berhasil diperbarui!";
         } else {
-            // Jalur Insert
             $sql = "INSERT INTO bahan_baku (nama, jumlah, satuan, rop) VALUES (:nama, :jumlah, :satuan, :rop)";
             $stmt = $koneksi->prepare($sql);
             $pesan_sukses = "Bahan baku baru berhasil ditambahkan!";
@@ -84,12 +80,10 @@ if (isset($_POST['simpan'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $is_edit ? "Edit Bahan Baku" : "Tambah Bahan Baku"; ?> - Dough & Co</title>
-    <!-- Aturan Path CSS: Mundur 2 Kali dari Folder form/ -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../../Assets/css/dashboard.css">
     
-    <!-- CSS Tambahan Khusus Elemen Form (Terpisah) -->
     <style>
         .form-container-custom {
             max-width: 600px;
@@ -147,13 +141,12 @@ if (isset($_POST['simpan'])) {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar Mundur 2 Kali -->
     <?php include "../../includes/sidebar.php"; ?>
 
-    <!-- Main Content Sisi Kanan -->
+    <!-- Main Content -->
     <main class="main-content">
         
-        <!-- Topbar dengan Tombol Kembali di Samping Judul -->
+        <!-- Topbar -->
         <div class="page-topbar">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <a href="../stok.php" class="btn-lihat" style="padding: 6px 12px; text-decoration: none;">← Kembali</a>
@@ -161,29 +154,25 @@ if (isset($_POST['simpan'])) {
             </div>
         </div>
 
-        <!-- Panel Form Dashboard Layout -->
+        <!-- Panel Form -->
         <div class="panel form-container-custom">
             <div class="panel-title" style="margin-bottom: 18px; border-bottom: 1px solid #f6e0ec; padding-bottom: 8px;">
                 Formulir Logistik Bahan Baku
             </div>
             
             <form action="" method="POST">
-                <!-- Hidden input ID untuk mode edit -->
                 <input type="hidden" name="id" value="<?= $id; ?>">
 
-                <!-- Nama Bahan Baku -->
                 <div class="form-group-custom">
                     <label class="label-custom">Nama Bahan Baku</label>
                     <input type="text" name="nama" class="input-custom" placeholder="Contoh: Tepung Terigu Cakra Kembar..." value="<?= htmlspecialchars($nama); ?>" required>
                 </div>
 
-                <!-- Jumlah Stok Awal / Sekarang -->
                 <div class="form-group-custom">
                     <label class="label-custom">Jumlah Stok Saat Ini</label>
                     <input type="number" name="jumlah" class="input-custom" min="0" value="<?= $jumlah; ?>" required>
                 </div>
 
-                <!-- Satuan Baku -->
                 <div class="form-group-custom">
                     <label class="label-custom">Satuan Pengukuran</label>
                     <select name="satuan" class="input-custom" required>
@@ -194,7 +183,6 @@ if (isset($_POST['simpan'])) {
                     </select>
                 </div>
 
-                <!-- Batas Reorder Point (ROP) -->
                 <div class="form-group-custom">
                     <label class="label-custom">Batas Minimum Kritis (ROP)</label>
                     <input type="number" name="rop" class="input-custom" min="0" value="<?= $rop; ?>" required>
@@ -203,7 +191,6 @@ if (isset($_POST['simpan'])) {
                     </small>
                 </div>
 
-                <!-- Tombol Submit Form -->
                 <div class="form-actions-custom">
                     <a href="../stok.php" class="btn-cancel-custom">Batal</a>
                     <button type="submit" name="simpan" class="btn-export">

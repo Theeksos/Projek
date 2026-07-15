@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. Proteksi Halaman: Hanya Staff yang boleh masuk
 if (!isset($_SESSION['role']) || (strtolower($_SESSION['role']) !== 'staf' && strtolower($_SESSION['role']) !== 'staff')) {
     header("Location: ../login.php"); 
     exit;
@@ -9,41 +8,48 @@ if (!isset($_SESSION['role']) || (strtolower($_SESSION['role']) !== 'staf' && st
 
 require_once "../config/database.php"; 
 
-// Tentukan menu aktif untuk sidebar
 $halaman_aktif = "dashboard";
 
-// Ambil ID Staff dari Session (yang disimpan sebagai id_user saat login)
-$id_staff = $_SESSION['id_user'] ?? 0;
-$nama_staff = $_SESSION['nama'] ?? 'Staff';
+if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'staff') {
+    header("Location: ../login.php");
+    exit;
+}
+
+require_once "../config/database.php";
+
+$id_user_login = $_SESSION['id_user']; 
 
 try {
-    // --- 2. AMBIL INFO KIOS TEMPAT STAFF BEKERJA (RELASI SATU ARAH) ---
-    // Mencari info kios dari tabel staff join ke kios lewat id_kios
-    $query_kios = "SELECT k.id_kios, k.nama_kios 
-                   FROM staff s
-                   INNER JOIN kios k ON s.id_kios = k.id_kios 
-                   WHERE s.id_staff = :id_staff 
-                   LIMIT 1";
-    $stmt_kios = $koneksi->prepare($query_kios);
-    $stmt_kios->bindParam(':id_staff', $id_staff);
-    $stmt_kios->execute();
-    $kios_info = $stmt_kios->fetch(PDO::FETCH_ASSOC);
+    $query = "SELECT 
+                s.nama_staff,
+                s.id_staff,
+                k.id_kios,
+                k.nama_kios
+              FROM tb_user u
+              INNER JOIN staff s ON u.id_user = s.id_user
+              INNER JOIN kios k ON s.id_kios = k.id_kios
+              WHERE u.id_user = :id_user
+              LIMIT 1";
 
-    $id_kios = $kios_info['id_kios'] ?? null;
-    $nama_kios = $kios_info['nama_kios'] ?? 'Kios (Belum Ditugaskan)';
+    $stmt = $koneksi->prepare($query);
+    $stmt->execute(['id_user' => $id_user_login]);
+    $data_staff = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // --- 3. AMBIL DATA STATISTIK UNTUK STAFF ---
-    // A. Total Stok Produk Kios (Mengambil data global produk atau silakan sesuaikan jika ada tabel stok per kios)
+    if (!$data_staff) {
+        die("Akun Anda belum terdaftar di kios manapun. Silakan hubungi Owner atau Mitra.");
+    }
+
+    $nama_staff = $data_staff['nama_staff'];
+    $nama_kios  = $data_staff['nama_kios'];
+    $id_kios    = $data_staff['id_kios'];
+
     $total_stok = $koneksi->query("SELECT SUM(stok) FROM produk")->fetchColumn() ?? 0;
 
-    // B. Produk dengan Stok Kritis (Stok <= ROP)
     $produk_kritis = $koneksi->query("SELECT COUNT(*) FROM produk WHERE stok <= rop")->fetchColumn() ?? 0;
 
-    // C. Jumlah SOP Kerja Aktif
     $total_sop = $koneksi->query("SELECT COUNT(*) FROM tb_sop")->fetchColumn() ?? 0;
 
 
-    // --- 4. QUERY DAFTAR PRODUK KRITIS (UNTUK SEGERA DI-RESTOCK) ---
     $stmt_kritis = $koneksi->query("
         SELECT nama, stok, rop, kategori 
         FROM produk 
@@ -64,7 +70,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - Staff Dashboard</title>
-    <!-- Link Aset -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Assets/css/dashboard.css">
@@ -73,7 +78,6 @@ try {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar Terfilter -->
     <?php include "../includes/sidebar.php"; ?>
 
     <!-- MAIN CONTENT -->
@@ -82,7 +86,7 @@ try {
         <!-- TOPBAR -->
         <div class="page-topbar">
             <div>
-                <h4>Semangat Kerja, <?= htmlspecialchars($nama_staff); ?>! 🥖</h4>
+                <h4>Semangat Kerja, <?= htmlspecialchars($nama_staff); ?>! </h4>
                 <p class="text-muted mb-0" style="font-size: 0.85rem;">Unit Kerja: <strong><?= htmlspecialchars($nama_kios); ?></strong></p>
             </div>
             <div class="topbar-actions">
@@ -94,17 +98,14 @@ try {
 
         <!-- 3 STAT CARDS -->
         <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
-            <!-- Stat 1: Total Stok Global/Kios -->
             <div class="stat-card stat-pink">
                 <div class="stat-label">TOTAL STOK PRODUK</div>
                 <div class="stat-value"><?= number_format($total_stok, 0, ',', '.'); ?> <span style="font-size: 0.9rem; font-weight: normal;">Pcs</span></div>
             </div>
-            <!-- Stat 2: Stok Kritis -->
             <div class="stat-card stat-orange">
                 <div class="stat-label">STOK MENIPIS (KRITIS)</div>
                 <div class="stat-value"><?= $produk_kritis; ?> <span style="font-size: 0.9rem; font-weight: normal; color: #d97706;">Menu</span></div>
             </div>
-            <!-- Stat 3: Dokumen SOP -->
             <div class="stat-card" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 1px solid #bae6fd;">
                 <div class="stat-label" style="color: #0369a1;">SOP & PANDUAN KERJA</div>
                 <div class="stat-value" style="color: #0369a1;"><?= $total_sop; ?> <span style="font-size: 0.9rem; font-weight: normal;">Dokumen</span></div>
@@ -114,7 +115,6 @@ try {
         <!-- TWO COLUMN LAYOUT -->
         <div class="row g-4 mt-2">
             
-            <!-- Kiri: Peringatan Stok & Tombol Aksi Cepat (Kelola Stok & Transaksi) -->
             <div class="col-lg-7">
                 <div class="panel mb-4">
                     <div class="panel-header-custom">
@@ -155,21 +155,8 @@ try {
                     </table>
                 </div>
 
-                <!-- Menu Pintasan Transaksi Kasir (Use Case: Input Transaksi) -->
-                <div class="panel">
-                    <div class="panel-title" style="color: #DB2777;">
-                        <i class="bi bi-cart-plus-fill me-2"></i>Kasir Penjualan Kios
-                    </div>
-                    <p class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">Gunakan tombol di bawah ini untuk mencatat transaksi pelanggan baru secara langsung.</p>
-                    <div class="mt-3">
-                        <a href="transaksi.php" class="btn-input-transaksi">
-                            <i class="bi bi-calculator me-2"></i> Mulai Input Transaksi Baru
-                        </a>
-                    </div>
-                </div>
             </div>
 
-            <!-- Kanan: Akses Cepat SOP Digital (Use Case: Akses SOP Digital) -->
             <div class="col-lg-5">
                 <div class="panel h-100 d-flex flex-column justify-content-between">
                     <div>

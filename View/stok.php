@@ -12,7 +12,6 @@ $halaman_aktif = "stok";
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    // 1. Query langsung ke tabel bahan_baku tanpa relasi ke tabel lain
     $query_str = "SELECT * FROM bahan_baku";
     
     if (!empty($search)) {
@@ -28,13 +27,10 @@ try {
     $stmt->execute();
     $all_stok = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Hitung ringkasan data berdasarkan nilai ROP secara dinamis
     $total_jenis = count($all_stok);
     
-    // Stok kritis jika jumlah kurang dari atau sama dengan nilai ROP ($jumlah \le ROP$)
     $stok_kritis = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah <= rop")->fetchColumn();
     
-    // Stok aman jika jumlah berada di atas nilai ROP ($jumlah > ROP$)
     $stok_aman = $koneksi->query("SELECT COUNT(*) FROM bahan_baku WHERE jumlah > rop")->fetchColumn();
 
 } catch (PDOException $e) {
@@ -48,7 +44,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - Stok Bahan Baku</title>
-    <!-- Aturan Link Aset untuk View Utama -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Assets/css/dashboard.css">
@@ -72,7 +67,6 @@ try {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar Utama -->
     <?php include "../includes/sidebar.php"; ?>
 
     <!-- MAIN CONTENT AREA -->
@@ -89,7 +83,7 @@ try {
             </div>
         </div>
 
-        <!-- 3 COLUMNS STAT GRID REVISI -->
+        <!-- 3 COLUMNS STAT GRID -->
         <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="stat-card stat-pink">
                 <div class="stat-label">JENIS STOK (VARIAN)</div>

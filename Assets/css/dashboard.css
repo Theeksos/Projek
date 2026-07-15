@@ -597,3 +597,109 @@ body {
         font-weight: 600;
         color: #374151;
     }
+
+    /* Form */
+    .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label-custom {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #DB2777;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-custom {
+            width: 100%;
+            border: 1px solid #f0d3e3;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            color: #374151;
+            font-family: inherit;
+            transition: border-color 0.15s ease;
+        }
+
+        .input-custom:focus {
+            outline: none;
+            border-color: #DB2777;
+            box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1);
+        }
+
+        textarea.input-custom {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-action-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 26px;
+        }
+
+        .btn-back {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-back:hover {
+            background-color: #e5e7eb;
+        }
+
+        .max-width-container {
+            max-width: 600px;
+        }
+        .form-container-custom {
+            max-width: 650px; 
+        }
+        .form-group-custom {
+            margin-bottom: 20px; 
+        }
+        .label-custom {
+            display: block; font-size: 0.8rem; font-weight: 600; color: #DB2777; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; 
+        }
+        .input-custom {
+            width: 100%; border: 1px solid #f0d3e3; border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; background-color: #ffffff; color: #374151; 
+        }
+        .input-custom:focus {
+            outline: none; border-color: #DB2777; box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1); 
+        }
+        .kios-selection-box {
+            border: 1px solid #f6e0ec; border-radius: 12px; padding: 16px; background-color: #fffdfd; max-height: 200px; overflow-y: auto; 
+        }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid #fcf2f7; 
+        }
+        .checkbox-item:last-child {
+            border-bottom: none; 
+        }
+        .checkbox-item input[type="checkbox"] {
+            accent-color: #DB2777; width: 16px; height: 16px; cursor: pointer; 
+        }
+        .checkbox-item label {
+             cursor: pointer; font-size: 0.9rem; color: #4b5563; font-weight: 500; width: 100%; 
+        }
+
+        .form-actions-custom {
+             display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; 
+        }
+
+        .btn-cancel-custom {
+             background-color: #f3f4f6; color: #4b5563; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; 
+        }

@@ -12,12 +12,6 @@ $halaman_aktif = "mitra";
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    /* 
-       LOGIKA BARU (GROUP_CONCAT):
-       Kita mengambil data dari tb_user, lalu men-JOIN tabel kios berdasarkan id_user (pemiliknya).
-       Fungsi GROUP_CONCAT akan otomatis menggabungkan nama-nama kios yang dimiliki oleh mitra yang sama
-       menjadi satu baris teks dipisahkan oleh tanda koma (misal: "Kios Alun-Alun, Kios Sudirman").
-    */
     $base_query = "SELECT u.id_user, u.nama_lengkap, u.role, 
                           GROUP_CONCAT(k.nama_kios SEPARATOR ', ') AS daftar_kios,
                           COUNT(k.id_kios) AS jumlah_kios_mitra
@@ -26,7 +20,6 @@ try {
                    WHERE u.role = 'Mitra'";
 
     if (!empty($search)) {
-        // Karena menggunakan GROUP BY, filter pencarian diletakkan sebelum GROUP BY
         $query_str = $base_query . " AND u.nama_lengkap LIKE :search GROUP BY u.id_user ORDER BY u.id_user DESC";
         $stmt = $koneksi->prepare($query_str);
         $search_param = "%" . $search . "%";
@@ -39,14 +32,10 @@ try {
     $stmt->execute();
     $all_mitra = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // --- LOGIKA HITUNG SUMMARY BOX (STAT GRID) ---
-    // 1. Total Mitra Unik
     $total_mitra = count($all_mitra);
     
-    // 2. Total Keseluruhan Kios Beroperasi
     $total_kios = $koneksi->query("SELECT COUNT(*) FROM kios")->fetchColumn();
     
-    // 3. Status Aktif (Dummy sesuai request)
     $mitra_aktif_dummy = $total_mitra;
 
 } catch (PDOException $e) {
@@ -158,7 +147,6 @@ try {
                                 <td>
                                     <?php if (!empty($row['daftar_kios'])): ?>
                                         <?php 
-                                        // Memecah kembali string koma menjadi array agar bisa dibentuk badge kotak-kotak kecil yang rapi
                                         $kios_array = explode(', ', $row['daftar_kios']);
                                         foreach ($kios_array as $kios_nama): 
                                         ?>

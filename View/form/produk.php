@@ -2,7 +2,11 @@
 session_start();
 require_once "../../config/database.php";
 
-// Definisikan variabel awal agar aman
+if (!isset($_SESSION['id_user'])) {
+    header("Location: ../login.php");
+    exit;
+}
+
 $id_produk    = '';
 $nama         = '';
 $keterangan   = '';
@@ -14,7 +18,6 @@ $status       = 'aman';
 $foto_lama    = 'default-product.png';
 $is_update    = false;
 
-// --- 1. DETEKSI MODE: JIKA ADA PARAMETER ID, MAKA MODE UPDATE ---
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $id_produk = $_GET['id'];
     $is_update = true;
@@ -44,7 +47,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     }
 }
 
-// --- 2. LOGIKA PROSES SIMPAN (TAMBAH / UPDATE) ---
 if (isset($_POST['simpan'])) {
     $nama       = trim($_POST['nama']);
     $keterangan = trim($_POST['keterangan']);
@@ -53,10 +55,6 @@ if (isset($_POST['simpan'])) {
     $stok       = intval($_POST['stok']);
     $rop        = intval($_POST['rop']);
     
-    // Logika otomatisasi status berdasarkan ROP & Stok
-    // Stok <= ROP -> Kritis
-    // Stok <= ROP + (ROP * 50%) -> Hampir Habis (misal batas aman toleransi 1.5 kali ROP)
-    // Selebihnya -> Aman
     if ($stok <= $rop) {
         $status = 'kritis';
     } elseif ($stok <= ($rop * 1.5)) {
@@ -65,9 +63,8 @@ if (isset($_POST['simpan'])) {
         $status = 'aman';
     }
 
-    $nama_file_foto = $foto_lama; // default gunakan foto lama/bawaan
+    $nama_file_foto = $foto_lama;
 
-    // Proses Upload Foto jika ada file baru yang diunggah
     if (isset($_FILES['foto']['name']) && !empty($_FILES['foto']['name'])) {
         $file_name = $_FILES['foto']['name'];
         $file_tmp  = $_FILES['foto']['tmp_name'];
@@ -76,17 +73,14 @@ if (isset($_POST['simpan'])) {
         $ekstensi_boleh = ['jpg', 'jpeg', 'png', 'webp'];
         
         if (in_array($file_ext, $ekstensi_boleh)) {
-            // Beri nama unik agar tidak bentrok
             $nama_file_foto = time() . '_' . preg_replace("/[^a-zA-Z0-9]/", "_", $nama) . '.' . $file_ext;
             $target_dir     = "../../Assets/images/produk/";
             
-            // Buat folder jika belum ada
             if (!is_dir($target_dir)) {
                 mkdir($target_dir, 0777, true);
             }
 
             if (move_uploaded_file($file_tmp, $target_dir . $nama_file_foto)) {
-                // Hapus foto lama dari penyimpanan jika bukan gambar default
                 if ($is_update && $foto_lama !== 'default-product.png' && file_exists($target_dir . $foto_lama)) {
                     unlink($target_dir . $foto_lama);
                 }
@@ -101,7 +95,6 @@ if (isset($_POST['simpan'])) {
 
     try {
         if ($is_update) {
-            // Query UPDATE
             $sql_query = "UPDATE produk SET 
                             nama = :nama, 
                             keterangan = :keterangan, 
@@ -115,7 +108,6 @@ if (isset($_POST['simpan'])) {
             $stmt = $koneksi->prepare($sql_query);
             $stmt->bindParam(':id', $id_produk);
         } else {
-            // Query INSERT
             $sql_query = "INSERT INTO produk (nama, keterangan, kategori, harga, stok, rop, status, foto) 
                           VALUES (:nama, :keterangan, :kategori, :harga, :stok, :rop, :status, :foto)";
             $stmt = $koneksi->prepare($sql_query);
@@ -148,7 +140,6 @@ if (isset($_POST['simpan'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - <?= $is_update ? 'Edit' : 'Tambah'; ?> Produk</title>
-    <!-- Aturan Link Aset untuk Halaman di sub-folder Form -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../../Assets/css/dashboard.css">
@@ -186,7 +177,6 @@ if (isset($_POST['simpan'])) {
 
 <div class="app-layout">
     
-    <!-- Include Sidebar dari Root Folder -->
     <?php include "../../includes/sidebar.php"; ?>
 
     <!-- MAIN CONTENT AREA -->
@@ -195,7 +185,6 @@ if (isset($_POST['simpan'])) {
         <!-- TOPBAR ACTION -->
         <div class="page-topbar">
             <h4><?= $is_update ? 'Edit Data' : 'Tambah Baru'; ?> Produk</h4>
-            <!-- Back Button menggunakan jalur relatif yang sudah disesuaikan -->
             <a href="../produk.php" class="btn-lihat" style="text-decoration: none;">Kembali</a>
         </div>
 
@@ -206,7 +195,6 @@ if (isset($_POST['simpan'])) {
             <form action="" method="POST" enctype="multipart/form-data" class="mt-3">
                 <div class="row g-4">
                     
-                    <!-- Kiri: Unggah Foto -->
                     <div class="col-md-4 text-center">
                         <div class="form-label-custom">Foto Produk</div>
                         <div class="d-flex flex-column align-items-center mt-2">
@@ -223,22 +211,18 @@ if (isset($_POST['simpan'])) {
                         </div>
                     </div>
 
-                    <!-- Kanan: Form Inputs -->
                     <div class="col-md-8">
                         <div class="row g-3">
-                            <!-- Nama Produk -->
                             <div class="col-12">
                                 <label class="form-label-custom">Nama Produk *</label>
                                 <input type="text" name="nama" class="form-input-custom" placeholder="Contoh: Croissant Almond" value="<?= htmlspecialchars($nama); ?>" required>
                             </div>
 
-                            <!-- Keterangan -->
                             <div class="col-12">
                                 <label class="form-label-custom">Keterangan / Deskripsi</label>
                                 <textarea name="keterangan" rows="3" class="form-input-custom" placeholder="Tulis deskripsi singkat produk..."><?= htmlspecialchars($keterangan); ?></textarea>
                             </div>
 
-                            <!-- Kategori -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">Kategori *</label>
                                 <select name="kategori" class="form-select-custom" required>
@@ -251,26 +235,22 @@ if (isset($_POST['simpan'])) {
                                 </select>
                             </div>
 
-                            <!-- Harga -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">Harga Jual (Rp) *</label>
                                 <input type="number" min="0" name="harga" class="form-input-custom" placeholder="Contoh: 25000" value="<?= htmlspecialchars($harga); ?>" required>
                             </div>
 
-                            <!-- Stok -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">Stok Awal *</label>
                                 <input type="number" min="0" name="stok" class="form-input-custom" placeholder="0" value="<?= htmlspecialchars($stok); ?>" required>
                             </div>
 
-                            <!-- ROP -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">Reorder Point (ROP) *</label>
                                 <input type="number" min="0" name="rop" class="form-input-custom" placeholder="Batas minimal sisa stok" value="<?= htmlspecialchars($rop); ?>" required>
                             </div>
                         </div>
 
-                        <!-- Tombol Submit -->
                         <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
                             <a href="../produk.php" class="btn-lihat" style="text-decoration: none; padding: 10px 20px;">Batal</a>
                             <button type="submit" name="simpan" class="btn-export" style="padding: 10px 20px;">
@@ -286,7 +266,6 @@ if (isset($_POST['simpan'])) {
     </main>
 </div>
 
-<!-- Script Pratonton (Preview) Gambar Secara Real-Time -->
 <script>
 function previewFile() {
     const preview = document.getElementById('previewImg');

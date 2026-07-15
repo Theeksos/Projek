@@ -12,7 +12,6 @@ $halaman_aktif = "kios";
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    // 1. Query ambil data kios + gabung nama pemilik dari tb_user
     $query_str = "SELECT k.*, u.nama_lengkap AS nama_pemilik 
                   FROM kios k 
                   LEFT JOIN tb_user u ON k.id_mitra = u.id_user";
@@ -30,22 +29,17 @@ try {
     $stmt->execute();
     $data_kios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Hitung data untuk 4 blok Stat Grid secara dinamis
-    // 2. Hitung data untuk 4 blok Stat Grid secara dinamis
     $total_kios = count($data_kios);
     
-    // Hitung Kios Buka dan Tutup berdasarkan kolom status
     $kios_buka  = $koneksi->query("SELECT COUNT(*) FROM kios WHERE status = 'buka'")->fetchColumn();
     $kios_tutup = $koneksi->query("SELECT COUNT(*) FROM kios WHERE status = 'tutup'")->fetchColumn();
     
-    // Total Pendapatan / Omset
     $total_omset = $koneksi->query("SELECT SUM(pendapatan) FROM kios")->fetchColumn() ?? 0;
 
 } catch (PDOException $e) {
     die("Gagal memuat data kios: " . $e->getMessage());
 }
 
-// Inisial untuk user login di pojok kiri bawah (Dummy / Sesuai Session Ryan)
 $user_login = $_SESSION['nama_user'] ?? 'Ryan';
 $user_role  = $_SESSION['role_user'] ?? 'Mitra';
 $inisial_user = strtoupper(substr($user_login, 0, 1));
@@ -57,11 +51,9 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dough & Co - Manajemen Kios</title>
-    <!-- Tetap bawa Bootstrap hanya untuk utilitas form grid & spasi jika dibutuhkan -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Assets/css/dashboard.css">
-    <!-- Tambahan input search manual agar selaras dengan style template baru -->
     <style>
         .input-search-custom {
             border: 1px solid #f0d3e3;
@@ -82,7 +74,6 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
 
 <div class="app-layout">
     
-    <!-- SIDEBAR BARU -->
     <?php include "../includes/sidebar.php"; ?>
 
 
@@ -100,7 +91,7 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
             </div>
         </div>
 
-        <!-- 4 COLUMNS STAT GRID REVISI -->
+        <!-- 4 COLUMNS STAT GRID -->
         <div class="stat-grid">
             <div class="stat-card stat-pink">
                 <div class="stat-label">TOTAL KIOS</div>

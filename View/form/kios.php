@@ -17,16 +17,13 @@ $id_mitra   = '';
 $pendapatan = 0;
 $status     = 'buka';
 
-// --- 1. AMBIL DATA MITRA UNTUK DROPDOWN (REVISI) ---
 try {
-    // Menambahkan alias 'u.' pada kolom status agar menunjuk langsung ke tb_user
     $stmt_mitra = $koneksi->query("SELECT id_user, nama_lengkap FROM tb_user WHERE role = 'mitra' ORDER BY nama_lengkap ASC");
     $list_mitra = $stmt_mitra->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Gagal mengambil data mitra: " . $e->getMessage());
 }
 
-// --- 2. LOGIKA DETEKSI MODE EDIT ---
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $is_edit = true;
     $id_kios = $_GET['id'];
@@ -52,7 +49,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     }
 }
 
-// --- 3. LOGIKA PROSES SIMPAN (INSERT / UPDATE) ---
 if (isset($_POST['simpan'])) {
     $form_id_kios = $_POST['id_kios'];
     $nama_kios    = trim($_POST['nama_kios']);
@@ -63,13 +59,11 @@ if (isset($_POST['simpan'])) {
 
     try {
         if (!empty($form_id_kios)) {
-            // Jalur Update
             $sql = "UPDATE kios SET nama_kios = :nama, lokasi = :lokasi, id_mitra = :id_mitra, pendapatan = :pendapatan, status = :status WHERE id_kios = :id";
             $stmt = $koneksi->prepare($sql);
             $stmt->bindParam(':id', $form_id_kios);
             $pesan_sukses = "Data kios berhasil diperbarui!";
         } else {
-            // Jalur Insert
             $sql = "INSERT INTO kios (nama_kios, lokasi, id_mitra, pendapatan, status) VALUES (:nama, :lokasi, :id_mitra, :pendapatan, :status)";
             $stmt = $koneksi->prepare($sql);
             $pesan_sukses = "Kios baru berhasil ditambahkan!";
@@ -90,7 +84,6 @@ if (isset($_POST['simpan'])) {
     }
 }
 
-// Info User di Sidebar
 $user_login = $_SESSION['nama_user'] ?? 'Ryan';
 $user_role  = $_SESSION['role_user'] ?? 'Mitra';
 $inisial_user = strtoupper(substr($user_login, 0, 1));
@@ -104,83 +97,12 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
     <title><?= $is_edit ? "Edit Kios" : "Tambah Kios"; ?> - Dough & Co</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../../Assets/css/dashboard.css">
-    
-    <!-- TERPISAH: Tambahan CSS khusus halaman form agar sesuai dengan tema dashboard baru -->
-    <style>
-        .form-group {
-            margin-bottom: 18px;
-        }
-        
-        .form-label-custom {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #DB2777;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-custom {
-            width: 100%;
-            border: 1px solid #f0d3e3;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.9rem;
-            background-color: #ffffff;
-            color: #374151;
-            font-family: inherit;
-            transition: border-color 0.15s ease;
-        }
-
-        .input-custom:focus {
-            outline: none;
-            border-color: #DB2777;
-            box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1);
-        }
-
-        textarea.input-custom {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-action-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 26px;
-        }
-
-        .btn-back {
-            background-color: #f3f4f6;
-            color: #4b5563;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.15s ease;
-        }
-
-        .btn-back:hover {
-            background-color: #e5e7eb;
-        }
-
-        .max-width-container {
-            max-width: 600px;
-        }
-    </style>
+    <link rel="stylesheet" href="../../Assets/css/dashboard.css">        
 </head>
 <body>
 
 <div class="app-layout">
     
-    <!-- SIDEBAR -->
     <?php include "../../includes/sidebar.php"; ?>
 
 
@@ -199,22 +121,18 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
             </div>
             
             <form action="" method="POST">
-                <!-- Hidden ID untuk mode edit -->
                 <input type="hidden" name="id_kios" value="<?= $id_kios; ?>">
 
-                <!-- Nama Kios -->
                 <div class="form-group">
                     <label class="form-label-custom">Nama Kios</label>
                     <input type="text" name="nama_kios" class="input-custom" placeholder="Contoh: Dough & Co - Kios Margonda" value="<?= htmlspecialchars($nama_kios); ?>" required>
                 </div>
 
-                <!-- Alamat Kios -->
                 <div class="form-group">
                     <label class="form-label-custom">Alamat Lengkap / Lokasi</label>
                     <textarea name="lokasi" class="input-custom" placeholder="Tuliskan alamat jalan, nomor, Kios..." required><?= htmlspecialchars($lokasi); ?></textarea>
                 </div>
 
-                <!-- Dropdown Pemilik (Mitra) -->
                 <div class="form-group">
                     <label class="form-label-custom">Pemilik Kios (Mitra)</label>
                     <select name="id_mitra" class="input-custom" required>
@@ -227,13 +145,11 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
                     </select>
                 </div>
 
-                <!-- Pendapatan Kios -->
                 <div class="form-group">
                     <label class="form-label-custom">Omset / Pendapatan Awal (Rp)</label>
                     <input type="number" name="pendapatan" class="input-custom" min="0" value="<?= $pendapatan; ?>" required>
                 </div>
 
-                <!-- Status Operasional Kios -->
                 <div class="form-group">
                     <label class="form-label-custom">Status Operasional</label>
                     <select name="status" class="input-custom" required>
@@ -242,7 +158,6 @@ $inisial_user = strtoupper(substr($user_login, 0, 1));
                     </select>
                 </div>
 
-                <!-- Tombol Aksi -->
                 <div class="form-action-row">
                     <a href="../kios.php" class="btn-back">Batal</a>
                     <button type="submit" name="simpan" class="btn-export">
