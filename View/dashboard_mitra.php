@@ -5,20 +5,201 @@ if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'mitra') {
     header("Location: login.php");
     exit;
 }
+
+require_once "../config/database.php"; 
+
+// Tentukan menu aktif untuk sidebar
+$halaman_aktif = "dashboard";
+
+try {
+    // --- 2. QUERY AMBIL DATA STATISTIK ---
+    // A. Total Kios
+    $total_kios = $koneksi->query("SELECT COUNT(*) FROM kios")->fetchColumn();
+
+    // B. Total Staf
+    // (Asumsi: staf adalah user dengan role_user selain Owner/Mitra, atau sesuaikan dengan struktur tb_user kamu)
+    $total_staf = $koneksi->query("SELECT COUNT(*) FROM tb_user WHERE role = 'Staff' OR role = 'Kasir'")->fetchColumn();
+
+    // C. Produk Status Kritis (Stok <= ROP)
+    $produk_kritis = $koneksi->query("SELECT COUNT(*) FROM produk WHERE stok <= rop")->fetchColumn();
+
+    // D. Estimasi Nilai Aset Produk (Total Stok x Harga)
+    $total_aset = $koneksi->query("SELECT SUM(stok * harga) FROM produk")->fetchColumn() ?? 0;
+
+
+    // --- 3. QUERY DAFTAR KIOS TERAKTIF / TERDAFTAR ---
+    $stmt_kios = $koneksi->query("
+        SELECT k.id_kios, k.nama_kios, u.nama_lengkap as nama_mitra 
+        FROM kios k
+        LEFT JOIN tb_user u ON k.id_mitra = u.id_user
+        LIMIT 5
+    ");
+    $ringkasan_kios = $stmt_kios->fetchAll(PDO::FETCH_ASSOC);
+
+
+    // --- 4. QUERY PRODUK YANG HARUS SEGERA DIPRODUKSI (KRITIS) ---
+    $stmt_alert = $koneksi->query("
+        SELECT nama, stok, rop, kategori 
+        FROM produk 
+        WHERE stok <= rop 
+        ORDER BY stok ASC 
+        LIMIT 5
+    ");
+    $alert_produk = $stmt_alert->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Gagal memuat data dashboard: " . $e->getMessage());
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Mitra - Dough & Co Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dough & Co - Owner Dashboard</title>
+    <!-- Aturan Link Aset -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../Assets/css/dashboard.css">
 </head>
-<body class="p-5" style="background:#FDF2F8;">
-    <div class="container">
-        <h2 class="mb-3" style="color:#DB2777;">Selamat datang, <?= htmlspecialchars($_SESSION['nama']) ?> 👋</h2>
-        <p class="text-muted">Kamu login sebagai: <strong><?= ucfirst($_SESSION['role']) ?></strong></p>
-        <p>ini juga belum hehe.</p>
-        <a href="logout.php" class="btn btn-outline-danger">Logout</a>
-    </div>
+<body>
+
+<div class="app-layout">
+    
+    <!-- Include Sidebar -->
+    <?php include "../includes/sidebar.php"; ?>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- TOPBAR -->
+        <div class="page-topbar">
+            <div>
+                <h4>Selamat Datang, <?= htmlspecialchars($_SESSION['nama'] ?? 'Owner'); ?>! 👋</h4>
+                <p class="text-muted mb-0" style="font-size: 0.85rem;">Berikut ringkasan operasional Dough & Co hari ini.</p>
+            </div>
+            <div class="topbar-actions">
+                <span class="badge bg-light text-dark p-2" style="border: 1px solid #f0d3e3;">
+                    <i class="bi bi-calendar3 me-2" style="color: #DB2777;"></i> <?= date('d M Y'); ?>
+                </span>
+            </div>
+        </div>
+
+        <!-- 4 STAT CARDS -->
+        <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <!-- Stat 1: Estimasi Aset -->
+            <div class="stat-card stat-pink">
+                <div class="stat-label">ESTIMASI NILAI PRODUK</div>
+                <div class="stat-value" style="font-size: 1.5rem;">Rp <?= number_format($total_aset, 0, ',', '.'); ?></div>
+            </div>
+            <!-- Stat 2: Total Kios -->
+            <div class="stat-card stat-green">
+                <div class="stat-label">TOTAL KIOS MITRA</div>
+                <div class="stat-value"><?= $total_kios; ?> <span style="font-size: 0.9rem; font-weight: normal; color: #059669;">Kios</span></div>
+            </div>
+            <!-- Stat 3: Produk Kritis -->
+            <div class="stat-card stat-orange">
+                <div class="stat-label">PRODUK KRITIS</div>
+                <div class="stat-value"><?= $produk_kritis; ?> <span style="font-size: 0.9rem; font-weight: normal; color: #d97706;">Menu</span></div>
+            </div>
+            <!-- Stat 4: Total Staf -->
+            <div class="stat-card" style="background: linear-gradient(135deg, #f3e8ff 0%, #fae8ff 100%); border: 1px solid #e9d5ff;">
+                <div class="stat-label" style="color: #7c3aed;">TOTAL STAF</div>
+                <div class="stat-value" style="color: #7c3aed;"><?= $total_staf; ?> <span style="font-size: 0.9rem; font-weight: normal;">Orang</span></div>
+            </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT -->
+        <div class="row g-4 mt-2">
+            
+            <!-- Kiri: Kinerja / Daftar Kios -->
+            <div class="col-lg-7">
+                <div class="panel h-100">
+                    <div class="panel-header-custom">
+                        <div class="panel-title">Daftar Kios Dough & Co</div>
+                        <a href="kios.php" class="btn-lihat-all">Lihat Semua Kios</a>
+                    </div>
+                    
+                    <table class="table-custom mt-3">
+                        <thead>
+                            <tr>
+                                <th>Nama Kios</th>
+                                <th>Penanggung Jawab (Mitra)</th>
+                                <th style="text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($ringkasan_kios)): ?>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">Belum ada kios terdaftar.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($ringkasan_kios as $kios): ?>
+                                    <tr>
+                                        <td style="font-weight: 600; color: #1f2937;">
+                                            <i class="bi bi-shop me-2 text-pink"></i><?= htmlspecialchars($kios['nama_kios']); ?>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark" style="border: 1px solid #e5e7eb;">
+                                                <?= htmlspecialchars($kios['nama_mitra'] ?? 'Belum ada mitra'); ?>
+                                            </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <a href="kios.php" class="btn-outline-pink" style="padding: 4px 10px; font-size: 0.78rem; text-decoration: none;">Detail</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Kanan: Log Peringatan Stok / ROP Alert -->
+            <div class="col-lg-5">
+                <div class="panel h-100">
+                    <div class="panel-title text-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Peringatan Restock Produk
+                    </div>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">Daftar menu yang stoknya sudah menyentuh atau berada di bawah nilai ROP.</p>
+                    
+                    <div class="alert-list-container mt-3">
+                        <?php if (empty($alert_produk)): ?>
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-check2-circle text-success" style="font-size: 2.5rem;"></i>
+                                <div class="mt-2" style="font-size: 0.88rem; font-weight: 600;">Semua Stok Aman!</div>
+                                <div style="font-size: 0.78rem;">Belum ada produk yang menyentuh batas kritis.</div>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($alert_produk as $alert): ?>
+                                <div class="alert-item-custom">
+                                    <div class="alert-icon-box">
+                                        <i class="bi bi-box-seam" style="color: #dc2626;"></i>
+                                    </div>
+                                    <div class="alert-info-box">
+                                        <div class="alert-product-name"><?= htmlspecialchars($alert['nama']); ?></div>
+                                        <div class="alert-product-meta">Kategori: <?= htmlspecialchars($alert['kategori']); ?></div>
+                                    </div>
+                                    <div class="alert-qty-box">
+                                        <span class="badge-status-kritis" style="font-size: 0.7rem;">Stok: <?= $alert['stok']; ?></span>
+                                        <div style="font-size: 0.68rem; color: #9ca3af; text-align: right; margin-top: 2px;">ROP: <?= $alert['rop']; ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <div class="text-end mt-3">
+                                <a href="produk.php" class="btn-lihat-all text-danger" style="border-color: #fecaca;">Kelola Stok Produk</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
 </body>
 </html>

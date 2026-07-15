@@ -111,6 +111,38 @@ body {
     font-size: 0.75rem;
 }
 
+.sidebar-logout-container {
+    padding: 15px 24px 5px 24px; /* Memberi jarak halus dari menu di atasnya */
+    border-top: 1px dashed rgba(219, 39, 119, 0.15); /* Garis pembatas tipis bertema pink */
+    margin-top: 10px;
+}
+
+.btn-sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #dc2626; /* Warna merah elegan untuk penanda keluar */
+    background-color: #fef2f2; /* Merah super soft */
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #fee2e2;
+}
+
+.btn-sidebar-logout i {
+    font-size: 1.1rem;
+}
+
+.btn-sidebar-logout:hover {
+    color: #ffffff;
+    background-color: #dc2626; /* Hover merah penuh */
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
 .main-content {
     flex-grow: 1;
     padding: 26px 32px;
@@ -350,3 +382,218 @@ body {
     color: #374151;
 }
 
+.panel-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+/* Tombol Kapsul Pink */
+    .btn-lihat-all {
+        font-size: 0.8rem;
+        color: #DB2777;
+        background-color: #fff1f7;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #fbcfe8;
+        padding: 6px 14px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.25s ease-in-out;
+    }
+    .btn-lihat-all:hover {
+        color: #ffffff;
+        background-color: #DB2777;
+        border-color: #DB2777;
+    }
+
+    /* Tombol Kapsul Orange */
+    .btn-lihat-all-orange {
+        font-size: 0.8rem;
+        color: #ea580c;
+        background-color: #fff7ed;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #ffedd5;
+        padding: 6px 14px;
+        border-radius: 20px;
+        transition: all 0.25s ease-in-out;
+    }
+    .btn-lihat-all-orange:hover {
+        color: #ffffff;
+        background-color: #ea580c;
+        border-color: #ea580c;
+    }
+
+    /* Tombol Kapsul Purple */
+    .btn-lihat-all-purple {
+        font-size: 0.8rem;
+        color: #7c3aed;
+        background-color: #f5f3ff;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #ddd6fe;
+        padding: 6px 14px;
+        border-radius: 20px;
+        transition: all 0.25s ease-in-out;
+    }
+    .btn-lihat-all-purple:hover {
+        color: #ffffff;
+        background-color: #7c3aed;
+        border-color: #7c3aed;
+    }
+
+    /* Staff List Component */
+    .staff-short-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .staff-card-short {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+    .staff-avatar-mini {
+        width: 36px;
+        height: 36px;
+        background-color: #ddd6fe;
+        color: #7c3aed;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .staff-details {
+        display: flex;
+        flex-direction: column;
+    }
+    .staff-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    .staff-role-badge {
+        font-size: 0.72rem;
+        color: #64748b;
+    }
+
+    /* Tombol Kapsul Blue (SOP) */
+    .btn-lihat-all-blue {
+        font-size: 0.8rem;
+        color: #0284c7;
+        background-color: #f0f9ff;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #bae6fd;
+        padding: 6px 14px;
+        border-radius: 20px;
+        transition: all 0.25s ease-in-out;
+    }
+    .btn-lihat-all-blue:hover {
+        color: #ffffff;
+        background-color: #0284c7;
+        border-color: #0284c7;
+    }
+
+    /* Tombol Transaksi Mewah */
+    .btn-input-transaksi {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background-color: #DB2777;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 4px 12px rgba(219, 39, 119, 0.15);
+    }
+    .btn-input-transaksi:hover {
+        background-color: #be185d;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(219, 39, 119, 0.25);
+    }
+
+    /* Badge Kritis */
+    .badge-status-kritis {
+        background-color: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    /* SOP Shortcut Styling */
+    .sop-shortcut-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .sop-card-shortcut {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    .sop-card-shortcut:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .sop-icon-box {
+        font-size: 1.4rem;
+        color: #0284c7;
+        background-color: #e0f2fe;
+        padding: 6px 10px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .sop-text-box {
+        flex-grow: 1;
+    }
+
+    .text-purple {
+        color: #7c3aed !important;
+    }
+
+    /* Small Alerts List Specific to Owner */
+    .owner-alert-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .alert-item-mini {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background-color: #fcf8f6;
+        border: 1px solid #f9ebe5;
+        border-radius: 8px;
+    }
+    .product-name-txt {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+    }
